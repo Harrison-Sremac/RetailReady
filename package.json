@@ -1,0 +1,19 @@
+{
+  "name": "retailready-mvp",
+  "version": "1.0.0",
+  "description": "RetailReady MVP - Compliance Guide Parser and Risk Assessment Tool",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm run dev",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": ["compliance", "retail", "pdf-parsing", "risk-assessment"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
