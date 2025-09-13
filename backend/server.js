@@ -157,7 +157,10 @@ async function parseComplianceData(pdfText) {
       temperature: 0.1,
     });
 
-    const parsedData = JSON.parse(response.choices[0].message.content);
+    const content = response.choices[0].message.content;
+    // Clean up the response in case it's wrapped in markdown code blocks
+    const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
+    const parsedData = JSON.parse(cleanContent);
     return parsedData.requirements || [];
   } catch (error) {
     console.error('Error parsing with OpenAI:', error);
