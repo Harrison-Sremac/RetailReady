@@ -2,7 +2,7 @@
 
 A full-stack SaaS tool that parses retailer compliance guides, extracts requirements and violations, and provides risk assessment for supply chain teams.
 
-## 🚀 Features
+## Features
 
 - **PDF Upload & Parsing**: Upload retailer compliance guides and extract structured data using AI
 - **Requirements Database**: Store and query compliance requirements, violations, and fine structures
@@ -10,7 +10,7 @@ A full-stack SaaS tool that parses retailer compliance guides, extracts requirem
 - **Interactive Dashboard**: Browse, filter, and search compliance requirements
 - **Pre-seeded Data**: Includes Dick's Sporting Goods compliance rules for immediate demo
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Backend
 - Node.js + Express
@@ -25,13 +25,13 @@ A full-stack SaaS tool that parses retailer compliance guides, extracts requirem
 - Axios for API calls
 - Lucide React for icons
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js (v16 or higher)
 - npm or yarn
 - OpenAI API key
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Clone and install dependencies**:
    ```bash
@@ -63,21 +63,21 @@ A full-stack SaaS tool that parses retailer compliance guides, extracts requirem
 
 4. **Open your browser** and navigate to http://localhost:3000
 
-## 📊 API Endpoints
+## API Endpoints
 
 - `POST /api/upload` - Upload and parse PDF compliance guides
 - `GET /api/violations` - Retrieve all compliance violations
 - `GET /api/categories` - Get available categories for filtering
 - `POST /api/risk-score` - Calculate risk score for a violation
 
-## 🎯 Usage
+## Usage
 
 1. **Upload Compliance Guide**: Drag and drop a PDF file to extract compliance requirements
 2. **Browse Requirements**: View all compliance violations with filtering options
 3. **Calculate Risk**: Select a violation and enter shipment size to estimate potential fines
 4. **Filter Data**: Use category, severity, and retailer filters to narrow down results
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 retailReady2/
@@ -95,7 +95,7 @@ retailReady2/
 └── package.json           # Root package.json with scripts
 ```
 
-## 🔧 Development
+## Development
 
 ### Backend Development
 ```bash
@@ -112,7 +112,7 @@ npm run dev
 ### Database
 The SQLite database is automatically created and seeded with Dick's Sporting Goods compliance data on first run.
 
-## 📈 Seed Data
+## Seed Data
 
 The application comes pre-loaded with Dick's Sporting Goods compliance requirements including:
 
@@ -122,7 +122,7 @@ The application comes pre-loaded with Dick's Sporting Goods compliance requireme
 - Delivery timeframes
 - Fine structures for violations
 
-## 🚀 Deployment
+## Deployment
 
 ### Local Deployment
 The application runs locally with the `npm run dev` command.
@@ -132,7 +132,7 @@ The application runs locally with the `npm run dev` command.
 - Backend: Deploy to Railway/Render/Heroku
 - Database: Use cloud SQLite or PostgreSQL
 
-## 🎨 UI Components
+## UI Components
 
 - **UploadZone**: Drag-and-drop PDF upload with progress indicators
 - **ViolationsList**: Card-based display of compliance requirements
@@ -140,7 +140,7 @@ The application runs locally with the `npm run dev` command.
 - **FilterBar**: Multi-criteria filtering system
 - **Header**: Application branding and navigation
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 - Multi-retailer support (Target, Walmart, etc.)
 - Worker checklist functionality
@@ -149,18 +149,18 @@ The application runs locally with the `npm run dev` command.
 - Cloud storage and multi-user accounts
 - Advanced analytics and reporting
 
-## 📝 License
+## License
 
 MIT License - see LICENSE file for details
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
 4. Submit a pull request
 
-## 📞 Support
+## Support
 
 For questions or issues, please open a GitHub issue or contact the development team.
 
