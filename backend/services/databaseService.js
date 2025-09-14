@@ -381,6 +381,30 @@ class DatabaseService {
       });
     });
   }
+
+  /**
+   * Clear all uploaded compliance data
+   * Removes all violations where retailer is 'Uploaded Document'
+   * 
+   * @returns {Promise<number>} Number of deleted records
+   */
+  async clearUploadedData() {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        "DELETE FROM violations WHERE retailer = 'Uploaded Document'",
+        function(err) {
+          if (err) {
+            console.error('Database error in clearUploadedData:', err);
+            reject(new Error('Failed to clear uploaded data'));
+            return;
+          }
+          
+          console.log(`Cleared ${this.changes} uploaded violations`);
+          resolve(this.changes);
+        }
+      );
+    });
+  }
 }
 
 module.exports = DatabaseService;

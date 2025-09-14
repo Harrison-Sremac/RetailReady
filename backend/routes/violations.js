@@ -263,6 +263,38 @@ function createViolationsRouter(db) {
     }
   });
 
+  /**
+   * DELETE /api/violations/clear-uploaded
+   * 
+   * Clear all uploaded compliance data
+   * 
+   * @route DELETE /api/violations/clear-uploaded
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Promise<void>}
+   */
+  router.delete('/clear-uploaded', async (req, res) => {
+    try {
+      console.log('Clearing uploaded compliance data...');
+      
+      const deletedCount = await dbService.clearUploadedData();
+      
+      console.log(`Cleared ${deletedCount} uploaded violations`);
+      
+      res.json({
+        success: true,
+        message: `Successfully cleared ${deletedCount} uploaded compliance requirements`,
+        deleted_count: deletedCount
+      });
+    } catch (error) {
+      console.error('Error clearing uploaded data:', error);
+      res.status(500).json({ 
+        error: 'Failed to clear uploaded data',
+        message: error.message 
+      });
+    }
+  });
+
   return router;
 }
 

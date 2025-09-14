@@ -169,6 +169,33 @@ function RobustApp() {
     }
   };
 
+  const handleClearUploadedData = async () => {
+    if (!confirm('Are you sure you want to delete all uploaded compliance data? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3001/api/violations/clear-uploaded', {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        alert('Uploaded data cleared successfully!');
+        // Refresh violations data
+        const violationsResponse = await violationsApi.getAll({});
+        if (violationsResponse.success && violationsResponse.data) {
+          setViolations(violationsResponse.data);
+        }
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to clear data: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Clear data error:', error);
+      alert('Failed to clear data. Please check your connection and try again.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -286,6 +313,19 @@ function RobustApp() {
                     <p className="text-gray-600">No files uploaded yet</p>
                     <p className="text-sm text-gray-500 mt-2">Upload a PDF to start parsing compliance requirements</p>
                   </div>
+                </div>
+                
+                {/* Clear Uploaded Data Button */}
+                <div className="mt-4">
+                  <button
+                    onClick={handleClearUploadedData}
+                    className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
+                  >
+                    🗑️ Clear Uploaded Data
+                  </button>
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    Remove all compliance data from uploaded PDFs
+                  </p>
                 </div>
                 
                 {/* Sample Upload Results */}
