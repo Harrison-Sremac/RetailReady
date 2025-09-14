@@ -12,6 +12,12 @@
 import { API_CONFIG, ERROR_MESSAGES } from './constants';
 import { Violation, RiskCalculation, Filters } from '../types';
 
+// Upload configuration constants
+const UPLOAD_CONFIG = {
+  ALLOWED_TYPES: ['application/pdf'],
+  MAX_SIZE: 10 * 1024 * 1024 // 10MB
+};
+
 /**
  * API Response wrapper type
  */
@@ -348,7 +354,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   delay: number
 ): (...args: Parameters<T>) => void {
-  let timeoutId: NodeJS.Timeout;
+  let timeoutId: number;
   
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);

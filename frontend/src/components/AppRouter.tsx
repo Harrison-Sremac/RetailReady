@@ -9,7 +9,7 @@
  * @version 1.0.0
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import RobustApp from './RobustApp';
 import WorkerInterface from './WorkerInterface';
 

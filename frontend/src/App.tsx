@@ -9,7 +9,7 @@
  * @version 1.0.0
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { UploadZone } from './components/UploadZone';
 import { ViolationsList } from './components/ViolationsList';
 import { RiskCalculator } from './components/RiskCalculator';

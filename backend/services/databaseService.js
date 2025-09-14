@@ -175,6 +175,13 @@ class DatabaseService {
       `);
       
       const insertedIds = [];
+      let completed = 0;
+      
+      if (violations.length === 0) {
+        stmt.finalize();
+        resolve(insertedIds);
+        return;
+      }
       
       violations.forEach(violation => {
         stmt.run([
@@ -192,11 +199,15 @@ class DatabaseService {
             return;
           }
           insertedIds.push(this.lastID);
+          completed++;
+          
+          // Check if all insertions are complete
+          if (completed === violations.length) {
+            stmt.finalize();
+            resolve(insertedIds);
+          }
         });
       });
-      
-      stmt.finalize();
-      resolve(insertedIds);
     });
   }
 
