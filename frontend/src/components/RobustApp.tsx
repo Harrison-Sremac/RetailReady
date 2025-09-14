@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Violation, Filters } from '../types';
 import { violationsApi } from '../utils/api';
 
@@ -11,6 +11,11 @@ function RobustApp() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiConnected, setApiConnected] = useState(false);
+  const [filters, setFilters] = useState<Filters>({
+    category: '',
+    severity: '',
+    retailer: ''
+  });
 
   // Test API connection on mount
   useEffect(() => {
@@ -33,6 +38,68 @@ function RobustApp() {
 
     testConnection();
   }, []);
+
+  // Filter violations based on current filters
+  const filteredViolations = useMemo(() => {
+    let filtered = violations;
+
+    if (filters.category) {
+      filtered = filtered.filter(v => v.category === filters.category);
+    }
+    
+    if (filters.severity) {
+      filtered = filtered.filter(v => v.severity === filters.severity);
+    }
+    
+    if (filters.retailer) {
+      filtered = filtered.filter(v => v.retailer === filters.retailer);
+    }
+
+    return filtered;
+  }, [violations, filters]);
+
+  // Get unique values for filter options
+  const categories = useMemo(() => [...new Set(violations.map(v => v.category))], [violations]);
+  const severities = useMemo(() => [...new Set(violations.map(v => v.severity))], [violations]);
+  const retailers = useMemo(() => [...new Set(violations.map(v => v.retailer))], [violations]);
+
+  // Handle file upload
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.includes('pdf')) {
+      alert('Please select a PDF file');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      alert('File size must be less than 10MB');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('http://localhost:3001/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert('File uploaded successfully! The system will process it shortly.');
+        // Refresh violations data
+        const violationsResponse = await violationsApi.getAll({});
+        if (violationsResponse.success && violationsResponse.data) {
+          setViolations(violationsResponse.data);
+        }
+      } else {
+        const errorData = await response.json();
+        alert(`Upload failed: ${errorData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload failed. Please check your connection and try again.');
+    }
+  };
 
   if (loading) {
     return (
@@ -60,7 +127,7 @@ function RobustApp() {
               {apiConnected ? '✓ Backend Connected' : '✗ Backend Disconnected'}
             </span>
             <span className="text-sm text-gray-500">
-              {violations.length} compliance requirements loaded
+              {filteredViolations.length} of {violations.length} requirements shown
             </span>
           </div>
         </div>
@@ -92,10 +159,79 @@ function RobustApp() {
               </div>
               <h2 className="text-xl font-semibold">Upload Compliance Guide</h2>
             </div>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <div className="text-gray-400 mb-2">📄</div>
-              <p className="text-gray-600 mb-2">Upload PDF compliance documents</p>
-              <p className="text-sm text-gray-500">PDF parsing feature will be available here</p>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Upload Area */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Upload PDF Document</h3>
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.add('border-blue-400', 'bg-blue-50');
+                  }}
+                  onDragLeave={(e) => {
+                    e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50');
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                      handleFileUpload(files[0]);
+                    }
+                  }}
+                  onClick={() => document.getElementById('file-input')?.click()}
+                >
+                  <div className="text-gray-400 text-4xl mb-4">📄</div>
+                  <p className="text-gray-600 mb-2">Drag & drop your PDF here</p>
+                  <p className="text-sm text-gray-500 mb-4">or click to browse files</p>
+                  <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    Choose File
+                  </button>
+                  <input
+                    id="file-input"
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileUpload(e.target.files[0]);
+                      }
+                    }}
+                  />
+                </div>
+                
+                <div className="mt-4 text-sm text-gray-600">
+                  <p><strong>Supported formats:</strong> PDF only</p>
+                  <p><strong>Max file size:</strong> 10MB</p>
+                  <p><strong>Supported content:</strong> Compliance guides, requirement documents</p>
+                </div>
+              </div>
+              
+              {/* Upload Status */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Status</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-center py-8">
+                    <div className="text-gray-400 text-4xl mb-2">📤</div>
+                    <p className="text-gray-600">No files uploaded yet</p>
+                    <p className="text-sm text-gray-500 mt-2">Upload a PDF to start parsing compliance requirements</p>
+                  </div>
+                </div>
+                
+                {/* Sample Upload Results */}
+                <div className="mt-4 bg-green-50 rounded-lg p-4">
+                  <h4 className="font-medium text-green-900 mb-2">What happens after upload:</h4>
+                  <ul className="text-sm text-green-800 space-y-1">
+                    <li>• PDF content is extracted and analyzed</li>
+                    <li>• Compliance requirements are identified</li>
+                    <li>• Violations and fines are cataloged</li>
+                    <li>• Data is added to your compliance database</li>
+                    <li>• Risk scores are calculated automatically</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -116,31 +252,70 @@ function RobustApp() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                      <option>All Categories</option>
-                      <option>Labeling</option>
-                      <option>Packaging</option>
-                      <option>ASN</option>
-                      <option>Delivery</option>
+                    <select 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      value={filters.category}
+                      onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                    >
+                      <option value="">All Categories</option>
+                      {categories.map(category => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Severity</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                      <option>All Severities</option>
-                      <option>High</option>
-                      <option>Medium</option>
-                      <option>Low</option>
+                    <select 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      value={filters.severity}
+                      onChange={(e) => setFilters(prev => ({ ...prev, severity: e.target.value }))}
+                    >
+                      <option value="">All Severities</option>
+                      {severities.map(severity => (
+                        <option key={severity} value={severity}>{severity}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Retailer</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                      <option>All Retailers</option>
-                      <option>Dick's Sporting Goods</option>
+                    <select 
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      value={filters.retailer}
+                      onChange={(e) => setFilters(prev => ({ ...prev, retailer: e.target.value }))}
+                    >
+                      <option value="">All Retailers</option>
+                      {retailers.map(retailer => (
+                        <option key={retailer} value={retailer}>{retailer}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
+                {(filters.category || filters.severity || filters.retailer) && (
+                  <div className="mt-4 flex items-center space-x-2">
+                    <span className="text-sm text-gray-600">Active filters:</span>
+                    {filters.category && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                        Category: {filters.category}
+                      </span>
+                    )}
+                    {filters.severity && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                        Severity: {filters.severity}
+                      </span>
+                    )}
+                    {filters.retailer && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                        Retailer: {filters.retailer}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => setFilters({ category: '', severity: '', retailer: '' })}
+                      className="text-xs text-red-600 hover:text-red-800 underline"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                )}
               </div>
               
               <div className="space-y-4">
@@ -148,25 +323,25 @@ function RobustApp() {
                   <h3 className="text-lg font-medium text-gray-900 mb-3">Quick Stats</h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Total Requirements:</span>
-                      <span className="font-medium">{violations.length}</span>
+                      <span className="text-gray-600">Showing:</span>
+                      <span className="font-medium">{filteredViolations.length}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">High Risk:</span>
                       <span className="font-medium text-red-600">
-                        {violations.filter(v => v.severity === 'High').length}
+                        {filteredViolations.filter(v => v.severity === 'High').length}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Medium Risk:</span>
                       <span className="font-medium text-yellow-600">
-                        {violations.filter(v => v.severity === 'Medium').length}
+                        {filteredViolations.filter(v => v.severity === 'Medium').length}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Low Risk:</span>
                       <span className="font-medium text-green-600">
-                        {violations.filter(v => v.severity === 'Low').length}
+                        {filteredViolations.filter(v => v.severity === 'Low').length}
                       </span>
                     </div>
                   </div>
@@ -185,8 +360,72 @@ function RobustApp() {
               </div>
               <h2 className="text-xl font-semibold">Risk Assessment Calculator</h2>
             </div>
-            <div className="bg-blue-50 rounded-lg p-4">
-              <p className="text-blue-800">Risk calculation tools will be available here</p>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Calculator Form */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Calculate Risk Score</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Violation</label>
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                      <option value="">Choose a violation to assess...</option>
+                      {filteredViolations.map(violation => (
+                        <option key={violation.id} value={violation.id}>
+                          {violation.category} - {violation.requirement}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity Affected</label>
+                    <input 
+                      type="number" 
+                      placeholder="e.g., 10 cartons, 5 items"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Frequency (per month)</label>
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                      <option value="">Select frequency...</option>
+                      <option value="1">1-2 times</option>
+                      <option value="2">3-5 times</option>
+                      <option value="3">6-10 times</option>
+                      <option value="4">11+ times</option>
+                    </select>
+                  </div>
+                  
+                  <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                    Calculate Risk Score
+                  </button>
+                </div>
+              </div>
+              
+              {/* Results Display */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Risk Assessment Results</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="text-center py-8">
+                    <div className="text-gray-400 text-4xl mb-2">📊</div>
+                    <p className="text-gray-600">Select a violation and click calculate to see risk assessment</p>
+                  </div>
+                </div>
+                
+                {/* Sample Risk Breakdown */}
+                <div className="mt-4 bg-blue-50 rounded-lg p-4">
+                  <h4 className="font-medium text-blue-900 mb-2">Risk Factors Considered:</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Severity level (High/Medium/Low)</li>
+                    <li>• Fine amount per violation</li>
+                    <li>• Frequency of occurrence</li>
+                    <li>• Quantity of items affected</li>
+                    <li>• Historical compliance record</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -201,9 +440,9 @@ function RobustApp() {
               <h2 className="text-xl font-semibold">Top Risk Areas</h2>
             </div>
             
-            {violations.length > 0 ? (
+            {filteredViolations.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {violations
+                {filteredViolations
                   .filter(v => v.severity === 'High')
                   .slice(0, 6)
                   .map((violation, index) => (
@@ -228,8 +467,8 @@ function RobustApp() {
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p>No violations loaded</p>
-                <p className="text-sm mt-2">Check your backend connection</p>
+                <p>No high-risk violations found</p>
+                <p className="text-sm mt-2">Try adjusting your filters or upload more data</p>
               </div>
             )}
           </div>
@@ -248,13 +487,13 @@ function RobustApp() {
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium text-gray-900">Compliance Requirements</h3>
               <span className="text-sm text-gray-500">
-                {violations.length} requirements
+                {filteredViolations.length} of {violations.length} requirements
               </span>
             </div>
             
-            {violations.length > 0 ? (
+            {filteredViolations.length > 0 ? (
               <div className="space-y-3">
-                {violations.slice(0, 10).map((violation) => (
+                {filteredViolations.slice(0, 10).map((violation) => (
                   <div key={violation.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -277,16 +516,16 @@ function RobustApp() {
                     </div>
                   </div>
                 ))}
-                {violations.length > 10 && (
+                {filteredViolations.length > 10 && (
                   <p className="text-center text-sm text-gray-500 mt-4">
-                    Showing first 10 of {violations.length} requirements
+                    Showing first 10 of {filteredViolations.length} requirements
                   </p>
                 )}
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p>No compliance requirements available</p>
-                <p className="text-sm mt-2">Check your backend connection and try refreshing</p>
+                <p>No compliance requirements match your filters</p>
+                <p className="text-sm mt-2">Try adjusting your filters or clear all filters</p>
               </div>
             )}
           </div>
