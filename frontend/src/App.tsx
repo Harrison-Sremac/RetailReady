@@ -283,64 +283,73 @@ function App() {
           </section>
         )}
 
-        {/* Step 3: Assess Risk */}
+        {/* Step 3: Risk Assessment Calculator */}
         <section className="mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center mb-6">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                 <span className="text-blue-600 font-semibold text-sm">3</span>
               </div>
-              <h2 className="text-xl font-semibold">Assess Risk</h2>
+              <h2 className="text-xl font-semibold">Risk Assessment Calculator</h2>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Risk Calculator */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Risk Assessment Calculator</h3>
-                <RiskCalculator 
-                  violations={filteredViolations}
-                  onCalculationComplete={handleRiskCalculationComplete}
-                />
-              </div>
-              
-              {/* Top Risk Areas */}
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Top Risk Areas</h3>
-                <div className="space-y-3">
-                  {violations
-                    .filter(v => v.severity === 'High')
-                    .slice(0, 3)
-                    .map((violation, index) => (
-                      <div key={violation.id} className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center mb-2">
-                              <span className="text-red-600 font-semibold text-sm mr-2">
-                                #{index + 1} Risk:
-                              </span>
-                              <span className="text-red-800 font-medium">{violation.category}</span>
-                            </div>
-                            <p className="text-sm text-red-700 mb-1">{violation.requirement}</p>
-                            <p className="text-sm font-medium text-red-800">{violation.fine}</p>
-                          </div>
-                          <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
-                            High
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </div>
+            <RiskCalculator 
+              violations={filteredViolations}
+              onCalculationComplete={handleRiskCalculationComplete}
+            />
           </div>
         </section>
 
-        {/* Step 4: Review Requirements */}
-        <section>
+        {/* Step 4: Top Risk Areas */}
+        <section className="mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center mb-6">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                 <span className="text-blue-600 font-semibold text-sm">4</span>
+              </div>
+              <h2 className="text-xl font-semibold">Top Risk Areas</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {violations
+                .filter(v => v.severity === 'High')
+                .slice(0, 6)
+                .map((violation, index) => (
+                  <div key={violation.id} className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-2">
+                          <span className="text-red-600 font-semibold text-sm mr-2">
+                            #{index + 1} Risk:
+                          </span>
+                          <span className="text-red-800 font-medium">{violation.category}</span>
+                        </div>
+                        <p className="text-sm text-red-700 mb-1">{violation.requirement}</p>
+                        <p className="text-sm font-medium text-red-800">{violation.fine}</p>
+                      </div>
+                      <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
+                        High
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+            
+            {violations.filter(v => v.severity === 'High').length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <p>No high-risk violations found</p>
+                <p className="text-sm mt-2">Upload compliance documents to see risk areas</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Step 5: Review Requirements */}
+        <section>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center mb-6">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-blue-600 font-semibold text-sm">5</span>
               </div>
               <h2 className="text-xl font-semibold">Review Requirements</h2>
             </div>
