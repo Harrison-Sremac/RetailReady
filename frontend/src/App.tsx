@@ -198,6 +198,17 @@ function App() {
           </div>
         </section>
 
+        {/* Risk Calculator */}
+        <section className="mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h2 className="text-xl font-semibold mb-4">Risk Assessment Calculator</h2>
+            <RiskCalculator 
+              violations={filteredViolations}
+              onCalculationComplete={handleRiskCalculationComplete}
+            />
+          </div>
+        </section>
+
         {/* Filters */}
         <section className="mb-6">
           <FilterBar 
@@ -241,17 +252,6 @@ function App() {
             </div>
           </section>
         )}
-
-        {/* Risk Calculator */}
-        <section className="mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold mb-4">Risk Assessment Calculator</h2>
-            <RiskCalculator 
-              violations={filteredViolations}
-              onCalculationComplete={handleRiskCalculationComplete}
-            />
-          </div>
-        </section>
 
         {/* Violations List */}
         <section>
