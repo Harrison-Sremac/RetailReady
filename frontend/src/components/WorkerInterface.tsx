@@ -205,21 +205,24 @@ function WorkerInterface() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           {/* Visual guide */}
           <div className="bg-gray-100 rounded-lg h-48 mb-4 flex items-center justify-center overflow-hidden">
-            {currentStep.visual && currentStep.visual.endsWith('.png') ? (
+            {currentStep.visual ? (
               <img 
-                src={`/worker-images/${currentStep.visual}`}
+                src={`/worker-images/${currentStep.visual.endsWith('.png') ? currentStep.visual.replace('.png', '.svg') : currentStep.visual}`}
                 alt="Compliance guidance visual"
                 className="max-w-full max-h-full object-contain"
                 onError={(e) => {
-                  // Fallback to SVG if PNG doesn't exist
-                  const svgName = currentStep.visual.replace('.png', '.svg');
-                  e.currentTarget.src = `/worker-images/${svgName}`;
+                  // Final fallback to emoji
+                  e.currentTarget.style.display = 'none';
+                  const fallbackDiv = document.createElement('div');
+                  fallbackDiv.className = 'text-center text-gray-500';
+                  fallbackDiv.innerHTML = '<div class="text-4xl mb-2">📦</div><p class="text-sm">Visual guide</p>';
+                  e.currentTarget.parentNode?.appendChild(fallbackDiv);
                 }}
               />
             ) : (
               <div className="text-center text-gray-500">
                 <div className="text-4xl mb-2">📦</div>
-                <p className="text-sm">{currentStep.visual || 'Visual guide'}</p>
+                <p className="text-sm">Visual guide</p>
               </div>
             )}
           </div>
