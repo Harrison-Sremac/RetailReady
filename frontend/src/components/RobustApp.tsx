@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Violation, Filters } from '../types';
 import { violationsApi } from '../utils/api';
+import Advertisement from './Advertisement';
 
 /**
  * Robust App Component with Error Boundaries
@@ -244,6 +245,9 @@ function RobustApp() {
             </div>
           </div>
         )}
+
+        {/* Advertisement */}
+        <Advertisement />
 
         {/* Step 1: Upload Compliance Guide */}
         <section className="mb-8">
