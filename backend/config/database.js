@@ -166,8 +166,8 @@ const dbConfig = {
   // Seed data for workers
   workerSeedData: [
     {
-      worker_id: "maria123",
-      name: "Maria Rodriguez",
+      worker_id: "johnny123",
+      name: "Johnny Appleseed",
       department: "Warehouse"
     },
     {
