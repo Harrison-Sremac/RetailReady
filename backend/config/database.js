@@ -37,6 +37,9 @@ const dbConfig = {
         category TEXT NOT NULL,
         severity TEXT NOT NULL,
         retailer TEXT DEFAULT 'Unknown',
+        fine_amount REAL,
+        fine_unit TEXT,
+        additional_fees TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `,
@@ -185,10 +188,46 @@ function createTables(db) {
             tablesCreated++;
             
             if (tablesCreated === totalTables) {
-              resolve();
+              // Run migrations after table creation
+              runMigrations(db).then(resolve).catch(reject);
             }
           }
         });
+      });
+    });
+  });
+}
+
+/**
+ * Run database migrations
+ * Adds new columns to existing tables
+ * 
+ * @param {sqlite3.Database} db - Database connection instance
+ * @returns {Promise<void>} Promise that resolves when migrations are complete
+ */
+function runMigrations(db) {
+  return new Promise((resolve, reject) => {
+    const migrations = [
+      "ALTER TABLE violations ADD COLUMN fine_amount REAL",
+      "ALTER TABLE violations ADD COLUMN fine_unit TEXT", 
+      "ALTER TABLE violations ADD COLUMN additional_fees TEXT"
+    ];
+    
+    let completed = 0;
+    
+    migrations.forEach((migration, index) => {
+      db.run(migration, (err) => {
+        // Ignore errors for columns that already exist
+        if (err && !err.message.includes('duplicate column name')) {
+          console.error(`Migration ${index + 1} failed:`, err);
+        } else if (!err) {
+          console.log(`Migration ${index + 1} completed: ${migration}`);
+        }
+        
+        completed++;
+        if (completed === migrations.length) {
+          resolve();
+        }
       });
     });
   });
