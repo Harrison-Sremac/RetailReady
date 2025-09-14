@@ -190,50 +190,85 @@ function App() {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Upload Section */}
+        {/* Step 1: Upload Compliance Guide */}
         <section className="mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold mb-4">Upload Compliance Guide</h2>
+            <div className="flex items-center mb-4">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-blue-600 font-semibold text-sm">1</span>
+              </div>
+              <h2 className="text-xl font-semibold">Upload Compliance Guide</h2>
+            </div>
             <UploadZone onUploadSuccess={handleUploadSuccess} />
           </div>
         </section>
 
-        {/* Risk Calculator */}
+        {/* Step 2: Filter & Explore */}
         <section className="mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-semibold mb-4">Risk Assessment Calculator</h2>
-            <RiskCalculator 
-              violations={filteredViolations}
-              onCalculationComplete={handleRiskCalculationComplete}
-            />
-          </div>
-        </section>
-
-        {/* Filters */}
-        <section className="mb-6">
-          <FilterBar 
-            categories={appState.categories}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-          />
-        </section>
-
-        {/* Database View Toggle */}
-        <section className="mb-6">
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900">Database View</h3>
-                <p className="text-sm text-gray-600">
-                  View organized compliance data by retailer and category
-                </p>
+            <div className="flex items-center mb-6">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-blue-600 font-semibold text-sm">2</span>
               </div>
-              <button
-                onClick={toggleDatabaseView}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                {appState.showDatabaseView ? 'Hide' : 'Show'} Database View
-              </button>
+              <h2 className="text-xl font-semibold">Filter & Explore</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Filters */}
+              <div className="lg:col-span-2">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Filter Requirements</h3>
+                <FilterBar 
+                  categories={appState.categories}
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                />
+              </div>
+              
+              {/* Database View & Quick Stats */}
+              <div className="space-y-4">
+                {/* Database View Toggle */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Database View</h3>
+                  <p className="text-sm text-gray-600 mb-3">
+                    View organized compliance data by retailer and category
+                  </p>
+                  <button
+                    onClick={toggleDatabaseView}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
+                    {appState.showDatabaseView ? 'Hide' : 'Show'} Database View
+                  </button>
+                </div>
+                
+                {/* Quick Stats */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">Quick Stats</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Total Requirements:</span>
+                      <span className="font-medium">{violations.length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">High Risk:</span>
+                      <span className="font-medium text-red-600">
+                        {violations.filter(v => v.severity === 'High').length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Medium Risk:</span>
+                      <span className="font-medium text-yellow-600">
+                        {violations.filter(v => v.severity === 'Medium').length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Low Risk:</span>
+                      <span className="font-medium text-green-600">
+                        {violations.filter(v => v.severity === 'Low').length}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -253,11 +288,70 @@ function App() {
           </section>
         )}
 
-        {/* Violations List */}
+        {/* Step 3: Assess Risk */}
+        <section className="mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center mb-6">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-blue-600 font-semibold text-sm">3</span>
+              </div>
+              <h2 className="text-xl font-semibold">Assess Risk</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Risk Calculator */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Risk Assessment Calculator</h3>
+                <RiskCalculator 
+                  violations={filteredViolations}
+                  onCalculationComplete={handleRiskCalculationComplete}
+                />
+              </div>
+              
+              {/* Top Risk Areas */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Top Risk Areas</h3>
+                <div className="space-y-3">
+                  {violations
+                    .filter(v => v.severity === 'High')
+                    .slice(0, 3)
+                    .map((violation, index) => (
+                      <div key={violation.id} className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center mb-2">
+                              <span className="text-red-600 font-semibold text-sm mr-2">
+                                #{index + 1} Risk:
+                              </span>
+                              <span className="text-red-800 font-medium">{violation.category}</span>
+                            </div>
+                            <p className="text-sm text-red-700 mb-1">{violation.requirement}</p>
+                            <p className="text-sm font-medium text-red-800">{violation.fine}</p>
+                          </div>
+                          <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
+                            High
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Step 4: Review Requirements */}
         <section>
           <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center mb-6">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-blue-600 font-semibold text-sm">4</span>
+              </div>
+              <h2 className="text-xl font-semibold">Review Requirements</h2>
+            </div>
+            
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Compliance Requirements</h2>
+              <h3 className="text-lg font-medium text-gray-900">Compliance Requirements</h3>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-500">
                   {filteredViolations.length} of {violations.length} requirements
