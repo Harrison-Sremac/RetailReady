@@ -1,0 +1,58 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  
+  <!-- Title -->
+  <text x="200" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#212529">
+    Final Verification Checklist
+  </text>
+  
+  <!-- Checklist items -->
+  <rect x="50" y="60" width="300" height="180" fill="white" stroke="#6c757d" stroke-width="2"/>
+  
+  <!-- Checklist title -->
+  <text x="200" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#212529">
+    Before Sealing Box - Final Check
+  </text>
+  
+  <!-- Checkbox 1 -->
+  <rect x="70" y="100" width="15" height="15" fill="white" stroke="#28a745" stroke-width="2"/>
+  <text x="75" y="110" font-family="Arial, sans-serif" font-size="12" fill="#28a745">✓</text>
+  <text x="95" y="112" font-family="Arial, sans-serif" font-size="12" fill="#495057">
+    Correct box size selected
+  </text>
+  
+  <!-- Checkbox 2 -->
+  <rect x="70" y="125" width="15" height="15" fill="white" stroke="#28a745" stroke-width="2"/>
+  <text x="75" y="135" font-family="Arial, sans-serif" font-size="12" fill="#28a745">✓</text>
+  <text x="95" y="137" font-family="Arial, sans-serif" font-size="12" fill="#495057">
+    UCC-128 label placed 2 inches from bottom-right corner
+  </text>
+  
+  <!-- Checkbox 3 -->
+  <rect x="70" y="150" width="15" height="15" fill="white" stroke="#28a745" stroke-width="2"/>
+  <text x="75" y="160" font-family="Arial, sans-serif" font-size="12" fill="#28a745">✓</text>
+  <text x="95" y="162" font-family="Arial, sans-serif" font-size="12" fill="#495057">
+    All UPC codes verified and readable
+  </text>
+  
+  <!-- Checkbox 4 -->
+  <rect x="70" y="175" width="15" height="15" fill="white" stroke="#28a745" stroke-width="2"/>
+  <text x="75" y="185" font-family="Arial, sans-serif" font-size="12" fill="#28a745">✓</text>
+  <text x="95" y="187" font-family="Arial, sans-serif" font-size="12" fill="#495057">
+    Items packed securely with protection
+  </text>
+  
+  <!-- Checkbox 5 -->
+  <rect x="70" y="200" width="15" height="15" fill="white" stroke="#28a745" stroke-width="2"/>
+  <text x="75" y="210" font-family="Arial, sans-serif" font-size="12" fill="#28a745">✓</text>
+  <text x="95" y="212" font-family="Arial, sans-serif" font-size="12" fill="#495057">
+    Order contents match barcode
+  </text>
+  
+  <!-- Success message -->
+  <rect x="50" y="250" width="300" height="30" fill="#d4edda" stroke="#28a745" stroke-width="2"/>
+  <text x="200" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#155724">
+    ✓ All checks complete - Ready to seal!
+  </text>
+</svg>

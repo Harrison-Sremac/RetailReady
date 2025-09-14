@@ -1,0 +1,67 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  
+  <!-- Title -->
+  <text x="200" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#212529">
+    Secure Packing Guide
+  </text>
+  
+  <!-- Box with items -->
+  <rect x="150" y="70" width="100" height="80" fill="white" stroke="#6c757d" stroke-width="2"/>
+  
+  <!-- Items in box -->
+  <rect x="160" y="80" width="20" height="15" fill="#17a2b8" opacity="0.7"/>
+  <rect x="190" y="85" width="18" height="12" fill="#17a2b8" opacity="0.7"/>
+  <rect x="170" y="105" width="22" height="10" fill="#17a2b8" opacity="0.7"/>
+  
+  <!-- Protection materials -->
+  <!-- Bubble wrap -->
+  <circle cx="165" cy="82" r="2" fill="#ffc107" opacity="0.6"/>
+  <circle cx="170" cy="85" r="1.5" fill="#ffc107" opacity="0.6"/>
+  <circle cx="168" cy="88" r="1.8" fill="#ffc107" opacity="0.6"/>
+  
+  <!-- Foam padding -->
+  <rect x="210" y="78" width="30" height="8" fill="#6f42c1" opacity="0.4"/>
+  <rect x="160" y="130" width="80" height="6" fill="#6f42c1" opacity="0.4"/>
+  
+  <!-- Good example label -->
+  <text x="200" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#28a745">
+    ✓ GOOD: Items protected and secure
+  </text>
+  
+  <!-- Protection checklist -->
+  <rect x="50" y="180" width="150" height="80" fill="#d4edda" stroke="#28a745" stroke-width="1"/>
+  <text x="125" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#155724">
+    Protection Checklist
+  </text>
+  <text x="60" y="220" font-family="Arial, sans-serif" font-size="11" fill="#155724">
+    ✓ Bubble wrap around items
+  </text>
+  <text x="60" y="235" font-family="Arial, sans-serif" font-size="11" fill="#155724">
+    ✓ Foam padding at bottom/top
+  </text>
+  <text x="60" y="250" font-family="Arial, sans-serif" font-size="11" fill="#155724">
+    ✓ Items cannot move around
+  </text>
+  
+  <!-- Bad example -->
+  <rect x="220" y="180" width="150" height="80" fill="#f8d7da" stroke="#dc3545" stroke-width="1"/>
+  <text x="295" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#721c24">
+    ❌ BAD: No Protection
+  </text>
+  <text x="230" y="220" font-family="Arial, sans-serif" font-size="11" fill="#721c24">
+    ❌ Items loose in box
+  </text>
+  <text x="230" y="235" font-family="Arial, sans-serif" font-size="11" fill="#721c24">
+    ❌ No padding materials
+  </text>
+  <text x="230" y="250" font-family="Arial, sans-serif" font-size="11" fill="#721c24">
+    ❌ Items can break
+  </text>
+  
+  <!-- Warning -->
+  <text x="200" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#dc3545" font-weight="bold">
+    ❌ Insufficient protection = $10/carton + $500 inspection fee
+  </text>
+</svg>

@@ -203,12 +203,25 @@ function WorkerInterface() {
 
         {/* Current step */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          {/* Visual guide placeholder */}
-          <div className="bg-gray-200 rounded-lg h-48 mb-4 flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <div className="text-4xl mb-2">📦</div>
-              <p className="text-sm">{currentStep.visual}</p>
-            </div>
+          {/* Visual guide */}
+          <div className="bg-gray-100 rounded-lg h-48 mb-4 flex items-center justify-center overflow-hidden">
+            {currentStep.visual && currentStep.visual.endsWith('.png') ? (
+              <img 
+                src={`/worker-images/${currentStep.visual}`}
+                alt="Compliance guidance visual"
+                className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  // Fallback to SVG if PNG doesn't exist
+                  const svgName = currentStep.visual.replace('.png', '.svg');
+                  e.currentTarget.src = `/worker-images/${svgName}`;
+                }}
+              />
+            ) : (
+              <div className="text-center text-gray-500">
+                <div className="text-4xl mb-2">📦</div>
+                <p className="text-sm">{currentStep.visual || 'Visual guide'}</p>
+              </div>
+            )}
           </div>
 
           {/* Instruction */}

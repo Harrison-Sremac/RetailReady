@@ -1,0 +1,108 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  
+  <!-- Title -->
+  <text x="200" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#212529">
+    UPC Code Verification Guide
+  </text>
+  
+  <!-- Good UPC Example -->
+  <rect x="50" y="70" width="140" height="80" fill="white" stroke="#28a745" stroke-width="2"/>
+  <text x="120" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#28a745">
+    ✓ GOOD UPC
+  </text>
+  
+  <!-- UPC Barcode representation -->
+  <rect x="70" y="100" width="100" height="20" fill="white" stroke="#000" stroke-width="1"/>
+  <rect x="72" y="102" width="2" height="16" fill="#000"/>
+  <rect x="76" y="102" width="1" height="16" fill="#000"/>
+  <rect x="78" y="102" width="2" height="16" fill="#000"/>
+  <rect x="82" y="102" width="1" height="16" fill="#000"/>
+  <rect x="85" y="102" width="2" height="16" fill="#000"/>
+  <rect x="90" y="102" width="1" height="16" fill="#000"/>
+  <rect x="92" y="102" width="2" height="16" fill="#000"/>
+  <rect x="96" y="102" width="1" height="16" fill="#000"/>
+  <rect x="98" y="102" width="2" height="16" fill="#000"/>
+  <rect x="102" y="102" width="1" height="16" fill="#000"/>
+  <rect x="104" y="102" width="2" height="16" fill="#000"/>
+  <rect x="108" y="102" width="1" height="16" fill="#000"/>
+  <rect x="110" y="102" width="2" height="16" fill="#000"/>
+  <rect x="114" y="102" width="1" height="16" fill="#000"/>
+  <rect x="116" y="102" width="2" height="16" fill="#000"/>
+  <rect x="120" y="102" width="1" height="16" fill="#000"/>
+  <rect x="122" y="102" width="2" height="16" fill="#000"/>
+  <rect x="126" y="102" width="1" height="16" fill="#000"/>
+  <rect x="128" y="102" width="2" height="16" fill="#000"/>
+  <rect x="132" y="102" width="1" height="16" fill="#000"/>
+  <rect x="134" y="102" width="2" height="16" fill="#000"/>
+  <rect x="138" y="102" width="1" height="16" fill="#000"/>
+  <rect x="140" y="102" width="2" height="16" fill="#000"/>
+  <rect x="144" y="102" width="1" height="16" fill="#000"/>
+  <rect x="146" y="102" width="2" height="16" fill="#000"/>
+  <rect x="150" y="102" width="2" height="16" fill="#000"/>
+  <rect x="154" y="102" width="1" height="16" fill="#000"/>
+  <rect x="156" y="102" width="2" height="16" fill="#000"/>
+  <rect x="160" y="102" width="1" height="16" fill="#000"/>
+  <rect x="162" y="102" width="2" height="16" fill="#000"/>
+  <rect x="166" y="102" width="1" height="16" fill="#000"/>
+  
+  <!-- UPC Numbers -->
+  <text x="120" y="135" text-anchor="middle" font-family="monospace" font-size="10" fill="#000">123456789012</text>
+  
+  <!-- Bad UPC Example -->
+  <rect x="210" y="70" width="140" height="80" fill="white" stroke="#dc3545" stroke-width="2"/>
+  <text x="280" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#dc3545">
+    ❌ BAD UPC
+  </text>
+  
+  <!-- Damaged UPC representation -->
+  <rect x="230" y="100" width="100" height="20" fill="white" stroke="#000" stroke-width="1"/>
+  <rect x="232" y="102" width="2" height="16" fill="#000"/>
+  <rect x="236" y="102" width="1" height="16" fill="#000"/>
+  <rect x="238" y="102" width="2" height="16" fill="#000"/>
+  <rect x="242" y="102" width="1" height="16" fill="#000"/>
+  <!-- Damaged section -->
+  <rect x="245" y="105" width="20" height="10" fill="#dc3545" opacity="0.5"/>
+  <text x="255" y="112" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="white">DAMAGED</text>
+  <!-- Continue barcode -->
+  <rect x="268" y="102" width="1" height="16" fill="#000"/>
+  <rect x="270" y="102" width="2" height="16" fill="#000"/>
+  <rect x="274" y="102" width="1" height="16" fill="#000"/>
+  <rect x="276" y="102" width="2" height="16" fill="#000"/>
+  <rect x="280" y="102" width="1" height="16" fill="#000"/>
+  <rect x="282" y="102" width="2" height="16" fill="#000"/>
+  <rect x="286" y="102" width="1" height="16" fill="#000"/>
+  <rect x="288" y="102" width="2" height="16" fill="#000"/>
+  <rect x="292" y="102" width="1" height="16" fill="#000"/>
+  <rect x="294" y="102" width="2" height="16" fill="#000"/>
+  <rect x="298" y="102" width="1" height="16" fill="#000"/>
+  <rect x="300" y="102" width="2" height="16" fill="#000"/>
+  <rect x="304" y="102" width="1" height="16" fill="#000"/>
+  <rect x="306" y="102" width="2" height="16" fill="#000"/>
+  <rect x="310" y="102" width="1" height="16" fill="#000"/>
+  <rect x="312" y="102" width="2" height="16" fill="#000"/>
+  <rect x="316" y="102" width="1" height="16" fill="#000"/>
+  <rect x="318" y="102" width="2" height="16" fill="#000"/>
+  <rect x="322" y="102" width="1" height="16" fill="#000"/>
+  
+  <!-- Instructions -->
+  <rect x="50" y="180" width="300" height="80" fill="#e9ecef" stroke="#6c757d" stroke-width="1"/>
+  <text x="200" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#212529">
+    Verification Steps
+  </text>
+  <text x="70" y="220" font-family="Arial, sans-serif" font-size="11" fill="#495057">
+    1. Scan each item's UPC code
+  </text>
+  <text x="70" y="235" font-family="Arial, sans-serif" font-size="11" fill="#495057">
+    2. Verify UPC matches order manifest
+  </text>
+  <text x="70" y="250" font-family="Arial, sans-serif" font-size="11" fill="#495057">
+    3. Check code is readable and undamaged
+  </text>
+  
+  <!-- Warning -->
+  <text x="200" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#dc3545" font-weight="bold">
+    ❌ Missing/incorrect UPC = $5/item + $100 processing fee
+  </text>
+</svg>
