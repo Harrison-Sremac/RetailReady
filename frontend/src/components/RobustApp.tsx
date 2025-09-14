@@ -145,7 +145,7 @@ function RobustApp() {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('pdf', file);
 
       const response = await fetch('http://localhost:3001/api/upload', {
         method: 'POST',
