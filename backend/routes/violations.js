@@ -62,49 +62,6 @@ function createViolationsRouter(db) {
   });
 
   /**
-   * GET /api/violations/:id
-   * 
-   * Retrieve a specific violation by ID
-   * 
-   * @route GET /api/violations/:id
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   * @returns {Promise<void>}
-   */
-  router.get('/:id', async (req, res) => {
-    try {
-      const { id } = req.params;
-      
-      // Validate ID parameter
-      if (!id || isNaN(parseInt(id))) {
-        return res.status(400).json({ 
-          error: 'Invalid violation ID',
-          message: 'Violation ID must be a valid number'
-        });
-      }
-      
-      console.log('Fetching violation with ID:', id);
-      
-      const violation = await dbService.getViolationById(parseInt(id));
-      
-      if (!violation) {
-        return res.status(404).json({ 
-          error: 'Violation not found',
-          message: `No violation found with ID ${id}`
-        });
-      }
-      
-      res.json(violation);
-    } catch (error) {
-      console.error('Error fetching violation:', error);
-      res.status(500).json({ 
-        error: 'Failed to fetch violation',
-        message: error.message 
-      });
-    }
-  });
-
-  /**
    * GET /api/violations/categories
    * 
    * Retrieve all unique categories
@@ -181,6 +138,49 @@ function createViolationsRouter(db) {
       console.error('Error fetching database view:', error);
       res.status(500).json({ 
         error: 'Failed to fetch database view',
+        message: error.message 
+      });
+    }
+  });
+
+  /**
+   * GET /api/violations/:id
+   * 
+   * Retrieve a specific violation by ID
+   * 
+   * @route GET /api/violations/:id
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Promise<void>}
+   */
+  router.get('/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Validate ID parameter
+      if (!id || isNaN(parseInt(id))) {
+        return res.status(400).json({ 
+          error: 'Invalid violation ID',
+          message: 'Violation ID must be a valid number'
+        });
+      }
+      
+      console.log('Fetching violation with ID:', id);
+      
+      const violation = await dbService.getViolationById(parseInt(id));
+      
+      if (!violation) {
+        return res.status(404).json({ 
+          error: 'Violation not found',
+          message: `No violation found with ID ${id}`
+        });
+      }
+      
+      res.json(violation);
+    } catch (error) {
+      console.error('Error fetching violation:', error);
+      res.status(500).json({ 
+        error: 'Failed to fetch violation',
         message: error.message 
       });
     }
