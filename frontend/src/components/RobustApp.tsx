@@ -16,6 +16,12 @@ function RobustApp() {
     severity: '',
     retailer: ''
   });
+  const [riskCalculation, setRiskCalculation] = useState<{
+    selectedViolation: string;
+    quantity: number;
+    frequency: string;
+    results: any;
+  } | null>(null);
 
   // Test API connection on mount
   useEffect(() => {
@@ -62,6 +68,68 @@ function RobustApp() {
   const categories = useMemo(() => [...new Set(violations.map(v => v.category))], [violations]);
   const severities = useMemo(() => [...new Set(violations.map(v => v.severity))], [violations]);
   const retailers = useMemo(() => [...new Set(violations.map(v => v.retailer))], [violations]);
+
+  // Handle risk calculation
+  const handleRiskCalculation = () => {
+    const selectedViolationId = (document.querySelector('select[data-risk-violation]') as HTMLSelectElement)?.value;
+    const quantity = parseInt((document.querySelector('input[data-risk-quantity]') as HTMLInputElement)?.value || '0');
+    const frequency = (document.querySelector('select[data-risk-frequency]') as HTMLSelectElement)?.value;
+
+    if (!selectedViolationId) {
+      alert('Please select a violation to assess');
+      return;
+    }
+
+    if (!quantity || quantity <= 0) {
+      alert('Please enter a valid quantity');
+      return;
+    }
+
+    if (!frequency) {
+      alert('Please select a frequency');
+      return;
+    }
+
+    const violation = violations.find(v => v.id.toString() === selectedViolationId);
+    if (!violation) {
+      alert('Selected violation not found');
+      return;
+    }
+
+    // Calculate risk score
+    const severityMultiplier = violation.severity === 'High' ? 3 : violation.severity === 'Medium' ? 2 : 1;
+    const frequencyMultiplier = parseInt(frequency);
+    
+    // Extract fine amount (basic parsing)
+    const fineMatch = violation.fine.match(/\$(\d+)/);
+    const baseFine = fineMatch ? parseInt(fineMatch[1]) : 100;
+    
+    const monthlyRisk = baseFine * quantity * frequencyMultiplier * severityMultiplier;
+    const annualRisk = monthlyRisk * 12;
+    
+    const riskLevel = monthlyRisk > 10000 ? 'Critical' : 
+                     monthlyRisk > 5000 ? 'High' : 
+                     monthlyRisk > 2000 ? 'Medium' : 'Low';
+
+    const results = {
+      violation: violation,
+      quantity: quantity,
+      frequency: frequency,
+      monthlyRisk: monthlyRisk,
+      annualRisk: annualRisk,
+      riskLevel: riskLevel,
+      severityMultiplier: severityMultiplier,
+      frequencyMultiplier: frequencyMultiplier,
+      baseFine: baseFine
+    };
+
+    setRiskCalculation({
+      selectedViolation: selectedViolationId,
+      quantity: quantity,
+      frequency: frequency,
+      results: results
+    });
+  };
 
   // Handle file upload
   const handleFileUpload = async (file: File) => {
@@ -368,7 +436,10 @@ function RobustApp() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Select Violation</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <select 
+                      data-risk-violation
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    >
                       <option value="">Choose a violation to assess...</option>
                       {filteredViolations.map(violation => (
                         <option key={violation.id} value={violation.id}>
@@ -381,6 +452,7 @@ function RobustApp() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Quantity Affected</label>
                     <input 
+                      data-risk-quantity
                       type="number" 
                       placeholder="e.g., 10 cartons, 5 items"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -389,7 +461,10 @@ function RobustApp() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Frequency (per month)</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <select 
+                      data-risk-frequency
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    >
                       <option value="">Select frequency...</option>
                       <option value="1">1-2 times</option>
                       <option value="2">3-5 times</option>
@@ -398,7 +473,10 @@ function RobustApp() {
                     </select>
                   </div>
                   
-                  <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                  <button 
+                    onClick={handleRiskCalculation}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                  >
                     Calculate Risk Score
                   </button>
                 </div>
@@ -407,12 +485,62 @@ function RobustApp() {
               {/* Results Display */}
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Risk Assessment Results</h3>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-center py-8">
-                    <div className="text-gray-400 text-4xl mb-2">📊</div>
-                    <p className="text-gray-600">Select a violation and click calculate to see risk assessment</p>
+                {riskCalculation ? (
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    {/* Risk Level */}
+                    <div className={`text-center p-4 rounded-lg mb-4 ${
+                      riskCalculation.results.riskLevel === 'Critical' ? 'bg-red-100 border border-red-200' :
+                      riskCalculation.results.riskLevel === 'High' ? 'bg-orange-100 border border-orange-200' :
+                      riskCalculation.results.riskLevel === 'Medium' ? 'bg-yellow-100 border border-yellow-200' :
+                      'bg-green-100 border border-green-200'
+                    }`}>
+                      <div className="text-2xl font-bold mb-2">
+                        {riskCalculation.results.riskLevel} Risk
+                      </div>
+                      <div className="text-lg">
+                        ${riskCalculation.results.monthlyRisk.toLocaleString()}/month
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        ${riskCalculation.results.annualRisk.toLocaleString()}/year
+                      </div>
+                    </div>
+
+                    {/* Violation Details */}
+                    <div className="mb-4">
+                      <h4 className="font-medium text-gray-900 mb-2">Violation Details</h4>
+                      <div className="text-sm space-y-1">
+                        <div><strong>Category:</strong> {riskCalculation.results.violation.category}</div>
+                        <div><strong>Severity:</strong> {riskCalculation.results.violation.severity}</div>
+                        <div><strong>Base Fine:</strong> ${riskCalculation.results.baseFine}</div>
+                        <div><strong>Quantity:</strong> {riskCalculation.quantity} items</div>
+                        <div><strong>Frequency:</strong> {riskCalculation.frequency === '1' ? '1-2 times' : 
+                                                      riskCalculation.frequency === '2' ? '3-5 times' :
+                                                      riskCalculation.frequency === '3' ? '6-10 times' : '11+ times'} per month</div>
+                      </div>
+                    </div>
+
+                    {/* Calculation Breakdown */}
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <h4 className="font-medium text-gray-900 mb-2">Calculation Breakdown</h4>
+                      <div className="text-sm space-y-1">
+                        <div>Base Fine: ${riskCalculation.results.baseFine}</div>
+                        <div>× Quantity: {riskCalculation.quantity}</div>
+                        <div>× Frequency: {riskCalculation.results.frequencyMultiplier}</div>
+                        <div>× Severity Multiplier: {riskCalculation.results.severityMultiplier}x</div>
+                        <div className="border-t pt-1 mt-2 font-medium">
+                          = Monthly Risk: ${riskCalculation.results.monthlyRisk.toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="text-center py-8">
+                      <div className="text-gray-400 text-4xl mb-2">📊</div>
+                      <p className="text-gray-600">Select a violation and click calculate to see risk assessment</p>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Sample Risk Breakdown */}
                 <div className="mt-4 bg-blue-50 rounded-lg p-4">
