@@ -159,16 +159,30 @@ export const DatabaseView: React.FC = () => {
         setLoading(true);
         setError(null);
         
+        console.log('Fetching database view...');
         const response = await violationsApi.getDatabaseView();
+        console.log('Database view response:', response);
         
         if (response.success && response.data) {
-          setData(response.data);
+          console.log('Setting database view data:', response.data);
+          // The backend returns { message, total_components, data: [...] }
+          // So we need to access response.data.data for the actual array
+          if (response.data.data && Array.isArray(response.data.data)) {
+            setData(response.data.data);
+          } else if (Array.isArray(response.data)) {
+            // Fallback if response.data is directly the array
+            setData(response.data);
+          } else {
+            console.error('Unexpected data structure:', response.data);
+            setError('Unexpected data structure received');
+          }
         } else {
+          console.error('Database view response failed:', response);
           setError('Failed to load database view');
         }
       } catch (err) {
         console.error('Error fetching database view:', err);
-        setError('Failed to load database view');
+        setError(`Failed to load database view: ${err.message || 'Unknown error'}`);
       } finally {
         setLoading(false);
       }
