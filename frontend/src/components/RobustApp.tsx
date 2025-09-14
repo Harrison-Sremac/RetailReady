@@ -26,7 +26,7 @@ function RobustApp() {
     frequency: string;
     results: any;
   } | null>(null);
-  const [showAds, setShowAds] = useState(true);
+  const [showAds, setShowAds] = useState(false);
 
   // Test API connection on mount
   useEffect(() => {
@@ -219,6 +219,11 @@ function RobustApp() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Advertisement Toggle - Top Right */}
+      <div className="container mx-auto px-4 pt-2">
+        <AdToggle showAds={showAds} onToggle={toggleAds} />
+      </div>
+      
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -235,9 +240,6 @@ function RobustApp() {
             </span>
           </div>
         </div>
-
-        {/* Advertisement Toggle */}
-        <AdToggle showAds={showAds} onToggle={toggleAds} />
 
         {/* Error Message */}
         {error && (
