@@ -190,54 +190,6 @@ const UnitsInput: React.FC<{
   </div>
 );
 
-/**
- * Top Risks Summary Component
- * 
- * Displays a summary of the highest risk violations.
- * 
- * @param violations - Array of violations to analyze
- * @returns JSX element
- */
-const TopRisksSummary: React.FC<{ violations: Violation[] }> = ({ violations }) => {
-  const getTopRisks = () => {
-    const highRiskViolations = violations.filter(v => v.severity === 'High');
-    return highRiskViolations.slice(0, 3);
-  };
-
-  const topRisks = getTopRisks();
-
-  if (topRisks.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <div className="flex items-center space-x-2 mb-3">
-        <TrendingUp className="w-5 h-5 text-gray-600" />
-        <h4 className="font-medium text-gray-900">Top Risk Areas</h4>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {topRisks.map((violation, index) => (
-          <div key={violation.id} className="bg-white p-3 rounded border">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-900">
-                #{index + 1} Risk
-              </span>
-              <SeverityBadge severity={violation.severity} size="sm" />
-            </div>
-            <div className="text-sm text-gray-600 mb-1">
-              {violation.category}
-            </div>
-            <div className="text-xs text-gray-500 truncate">
-              {violation.fine}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 /**
  * Risk Calculator Component
@@ -355,8 +307,6 @@ export const RiskCalculator: React.FC<RiskCalculatorProps> = ({
         </div>
       </div>
 
-      {/* Top Risks Summary */}
-      <TopRisksSummary violations={violations} />
     </div>
   );
 };
