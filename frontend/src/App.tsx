@@ -1,75 +1,188 @@
-import React, { useState, useEffect } from 'react'
-import { UploadZone } from './components/UploadZone'
-import { ViolationsList } from './components/ViolationsList'
-import { RiskCalculator } from './components/RiskCalculator'
-import { Header } from './components/Header'
-import { FilterBar } from './components/FilterBar'
-import { Violation } from './types'
+/**
+ * Main Application Component (Refactored)
+ * 
+ * This is the main application component with enhanced architecture,
+ * better state management, and improved user experience.
+ * 
+ * @fileoverview Enhanced main application component
+ * @author RetailReady Team
+ * @version 1.0.0
+ */
 
+import React, { useState, useEffect } from 'react';
+import { UploadZone } from './components/UploadZone';
+import { ViolationsList } from './components/ViolationsList-refactored';
+import { RiskCalculator } from './components/RiskCalculator-refactored';
+import { Header } from './components/Header';
+import { FilterBar } from './components/FilterBar';
+import { Violation, Filters } from './types';
+import { useViolations } from './hooks/useViolations';
+import { violationsApi } from './utils/api';
+import { APP_METADATA } from './utils/constants';
+
+/**
+ * Application state interface
+ */
+interface AppState {
+  categories: string[];
+  retailers: string[];
+  selectedViolation: Violation | null;
+  showDatabaseView: boolean;
+}
+
+/**
+ * Main Application Component
+ * 
+ * Enhanced application with improved architecture and user experience.
+ * 
+ * @returns JSX element
+ * 
+ * @example
+ * <App />
+ */
 function App() {
-  const [violations, setViolations] = useState<Violation[]>([])
-  const [filteredViolations, setFilteredViolations] = useState<Violation[]>([])
-  const [categories, setCategories] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filters, setFilters] = useState({
-    category: '',
-    severity: '',
-    retailer: ''
-  })
+  // Custom hooks for data management
+  const {
+    violations,
+    filteredViolations,
+    loading: violationsLoading,
+    error: violationsError,
+    filters,
+    setFilters,
+    refreshViolations,
+    clearError: clearViolationsError
+  } = useViolations();
 
-  // Fetch violations and categories on component mount
+  // Local state
+  const [appState, setAppState] = useState<AppState>({
+    categories: [],
+    retailers: [],
+    selectedViolation: null,
+    showDatabaseView: false
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  /**
+   * Fetch categories and retailers on component mount
+   */
   useEffect(() => {
-    fetchViolations()
-    fetchCategories()
-  }, [])
+    const fetchInitialData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  // Update filtered violations when violations or filters change
-  useEffect(() => {
-    let filtered = violations
+        const [categoriesResponse, retailersResponse] = await Promise.all([
+          violationsApi.getCategories(),
+          violationsApi.getRetailers()
+        ]);
 
-    if (filters.category) {
-      filtered = filtered.filter(v => v.category === filters.category)
-    }
-    if (filters.severity) {
-      filtered = filtered.filter(v => v.severity === filters.severity)
-    }
-    if (filters.retailer) {
-      filtered = filtered.filter(v => v.retailer === filters.retailer)
-    }
+        if (categoriesResponse.success && categoriesResponse.data) {
+          setAppState(prev => ({ ...prev, categories: categoriesResponse.data }));
+        }
 
-    setFilteredViolations(filtered)
-  }, [violations, filters])
+        if (retailersResponse.success && retailersResponse.data) {
+          setAppState(prev => ({ ...prev, retailers: retailersResponse.data }));
+        }
+      } catch (err) {
+        console.error('Error fetching initial data:', err);
+        setError('Failed to load application data');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchViolations = async () => {
+    fetchInitialData();
+  }, []);
+
+  /**
+   * Handle successful file upload
+   */
+  const handleUploadSuccess = async () => {
     try {
-      const response = await fetch('/api/violations')
-      const data = await response.json()
-      setViolations(data)
-    } catch (error) {
-      console.error('Error fetching violations:', error)
-    } finally {
-      setLoading(false)
+      // Refresh violations data
+      await refreshViolations();
+      
+      // Refresh categories and retailers
+      const [categoriesResponse, retailersResponse] = await Promise.all([
+        violationsApi.getCategories(),
+        violationsApi.getRetailers()
+      ]);
+
+      if (categoriesResponse.success && categoriesResponse.data) {
+        setAppState(prev => ({ ...prev, categories: categoriesResponse.data }));
+      }
+
+      if (retailersResponse.success && retailersResponse.data) {
+        setAppState(prev => ({ ...prev, retailers: retailersResponse.data }));
+      }
+    } catch (err) {
+      console.error('Error refreshing data after upload:', err);
     }
+  };
+
+  /**
+   * Handle filter changes
+   */
+  const handleFilterChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+  };
+
+  /**
+   * Handle violation selection
+   */
+  const handleViolationClick = (violation: Violation) => {
+    setAppState(prev => ({ ...prev, selectedViolation: violation }));
+  };
+
+  /**
+   * Handle risk calculation completion
+   */
+  const handleRiskCalculationComplete = (calculation: any) => {
+    console.log('Risk calculation completed:', calculation);
+    // Could store calculation history or trigger other actions
+  };
+
+  /**
+   * Toggle database view
+   */
+  const toggleDatabaseView = () => {
+    setAppState(prev => ({ ...prev, showDatabaseView: !prev.showDatabaseView }));
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading {APP_METADATA.NAME}</h2>
+          <p className="text-gray-600">Please wait while we initialize the application...</p>
+        </div>
+      </div>
+    );
   }
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/categories')
-      const data = await response.json()
-      setCategories(data)
-    } catch (error) {
-      console.error('Error fetching categories:', error)
-    }
-  }
-
-  const handleUploadSuccess = () => {
-    // Refresh violations after successful upload
-    fetchViolations()
-    fetchCategories()
-  }
-
-  const handleFilterChange = (newFilters: typeof filters) => {
-    setFilters(newFilters)
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-red-600 text-xl">⚠️</span>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Application Error</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Reload Application
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -88,17 +201,55 @@ function App() {
         {/* Filters */}
         <section className="mb-6">
           <FilterBar 
-            categories={categories}
+            categories={appState.categories}
             filters={filters}
             onFilterChange={handleFilterChange}
           />
         </section>
 
+        {/* Database View Toggle */}
+        <section className="mb-6">
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Database View</h3>
+                <p className="text-sm text-gray-600">
+                  View organized compliance data by retailer and category
+                </p>
+              </div>
+              <button
+                onClick={toggleDatabaseView}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                {appState.showDatabaseView ? 'Hide' : 'Show'} Database View
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Database View */}
+        {appState.showDatabaseView && (
+          <section className="mb-8">
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h2 className="text-xl font-semibold mb-4">Database Overview</h2>
+              <div className="text-center py-8 text-gray-500">
+                <p>Database view functionality will be implemented here</p>
+                <p className="text-sm mt-2">
+                  This will show organized data by retailer and category
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Risk Calculator */}
         <section className="mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-xl font-semibold mb-4">Risk Assessment Calculator</h2>
-            <RiskCalculator violations={filteredViolations} />
+            <RiskCalculator 
+              violations={filteredViolations}
+              onCalculationComplete={handleRiskCalculationComplete}
+            />
           </div>
         </section>
 
@@ -107,24 +258,57 @@ function App() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Compliance Requirements</h2>
-              <span className="text-sm text-gray-500">
-                {filteredViolations.length} of {violations.length} requirements
-              </span>
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-500">
+                  {filteredViolations.length} of {violations.length} requirements
+                </span>
+                {violationsError && (
+                  <button
+                    onClick={clearViolationsError}
+                    className="text-sm text-red-600 hover:text-red-800 underline"
+                  >
+                    Clear Error
+                  </button>
+                )}
+              </div>
             </div>
             
-            {loading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              </div>
-            ) : (
-              <ViolationsList violations={filteredViolations} />
-            )}
+            <ViolationsList 
+              violations={filteredViolations}
+              loading={violationsLoading}
+              error={violationsError}
+              onViolationClick={handleViolationClick}
+            />
           </div>
         </section>
+
+        {/* Selected Violation Details */}
+        {appState.selectedViolation && (
+          <section className="mt-8">
+            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
+              <h3 className="text-lg font-semibold text-blue-900 mb-4">
+                Selected Violation Details
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div><strong>Requirement:</strong> {appState.selectedViolation.requirement}</div>
+                <div><strong>Violation:</strong> {appState.selectedViolation.violation}</div>
+                <div><strong>Fine:</strong> {appState.selectedViolation.fine}</div>
+                <div><strong>Category:</strong> {appState.selectedViolation.category}</div>
+                <div><strong>Severity:</strong> {appState.selectedViolation.severity}</div>
+                <div><strong>Retailer:</strong> {appState.selectedViolation.retailer}</div>
+              </div>
+              <button
+                onClick={() => setAppState(prev => ({ ...prev, selectedViolation: null }))}
+                className="mt-4 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+              >
+                Close Details
+              </button>
+            </div>
+          </section>
+        )}
       </main>
     </div>
-  )
+  );
 }
 
-export default App
-
+export default App;

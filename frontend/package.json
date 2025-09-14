@@ -1,8 +1,19 @@
 {
   "name": "retailready-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "RetailReady Frontend - React-based compliance management interface",
+  "keywords": [
+    "react",
+    "typescript",
+    "compliance",
+    "retail",
+    "risk-assessment",
+    "tailwindcss"
+  ],
+  "author": "RetailReady Team",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

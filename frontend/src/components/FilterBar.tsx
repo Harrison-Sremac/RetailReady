@@ -2,12 +2,41 @@ import React from 'react'
 import { Filter, X } from 'lucide-react'
 import { Filters } from '../types'
 
+/**
+ * Filter Bar Component Props
+ */
 interface FilterBarProps {
+  /** Array of available categories for filtering */
   categories: string[]
+  /** Current filter values */
   filters: Filters
+  /** Callback function when filters change */
   onFilterChange: (filters: Filters) => void
 }
 
+/**
+ * Filter Bar Component
+ * 
+ * Provides filtering controls for compliance violations including category,
+ * severity, and retailer filters. Displays active filters and allows clearing.
+ * 
+ * @fileoverview Filtering interface component for violations data
+ * @author RetailReady Team
+ * @version 1.0.0
+ * 
+ * @param props - Component props
+ * @param props.categories - Available categories for filtering
+ * @param props.filters - Current filter state
+ * @param props.onFilterChange - Callback for filter changes
+ * @returns JSX element containing filter controls
+ * 
+ * @example
+ * <FilterBar 
+ *   categories={['Labeling', 'ASN', 'Packaging']}
+ *   filters={{ category: '', severity: '', retailer: '' }}
+ *   onFilterChange={(filters) => setFilters(filters)}
+ * />
+ */
 export const FilterBar: React.FC<FilterBarProps> = ({ 
   categories, 
   filters, 
@@ -16,18 +45,36 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const severityOptions = ['High', 'Medium', 'Low']
   const retailerOptions = ["Dick's Sporting Goods", "Uploaded Document"]
 
+  /**
+   * Handle category filter change
+   * 
+   * @param category - Selected category value
+   */
   const handleCategoryChange = (category: string) => {
     onFilterChange({ ...filters, category })
   }
 
+  /**
+   * Handle severity filter change
+   * 
+   * @param severity - Selected severity value
+   */
   const handleSeverityChange = (severity: string) => {
     onFilterChange({ ...filters, severity })
   }
 
+  /**
+   * Handle retailer filter change
+   * 
+   * @param retailer - Selected retailer value
+   */
   const handleRetailerChange = (retailer: string) => {
     onFilterChange({ ...filters, retailer })
   }
 
+  /**
+   * Clear all active filters
+   */
   const clearFilters = () => {
     onFilterChange({ category: '', severity: '', retailer: '' })
   }

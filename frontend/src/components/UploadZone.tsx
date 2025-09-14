@@ -1,26 +1,62 @@
 import React, { useState, useRef } from 'react'
 import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react'
 
+/**
+ * Upload Zone Component Props
+ */
 interface UploadZoneProps {
+  /** Callback function called when upload is successful */
   onUploadSuccess: () => void
 }
 
+/**
+ * Upload Zone Component
+ * 
+ * Provides a drag-and-drop file upload interface for PDF compliance documents.
+ * Handles file validation, upload progress, and user feedback.
+ * 
+ * @fileoverview File upload component with drag-and-drop functionality
+ * @author RetailReady Team
+ * @version 1.0.0
+ * 
+ * @param props - Component props
+ * @param props.onUploadSuccess - Callback function called when upload succeeds
+ * @returns JSX element containing the upload interface
+ * 
+ * @example
+ * <UploadZone onUploadSuccess={() => console.log('Upload successful!')} />
+ */
 export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
   const [isDragOver, setIsDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  /**
+   * Handle drag over event for drag-and-drop functionality
+   * 
+   * @param e - Drag event object
+   */
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(true)
   }
 
+  /**
+   * Handle drag leave event for drag-and-drop functionality
+   * 
+   * @param e - Drag event object
+   */
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
   }
 
+  /**
+   * Handle file drop event for drag-and-drop functionality
+   * 
+   * @param e - Drag event object
+   */
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragOver(false)
@@ -31,6 +67,11 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
     }
   }
 
+  /**
+   * Handle file selection from file input
+   * 
+   * @param e - Change event from file input
+   */
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (files && files.length > 0) {
@@ -38,6 +79,11 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
     }
   }
 
+  /**
+   * Handle file upload process including validation and API call
+   * 
+   * @param file - File object to upload
+   */
   const handleFileUpload = async (file: File) => {
     if (file.type !== 'application/pdf') {
       setMessage({ type: 'error', text: 'Please upload a PDF file only' })
@@ -74,6 +120,9 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
     }
   }
 
+  /**
+   * Open the file selection dialog programmatically
+   */
   const openFileDialog = () => {
     fileInputRef.current?.click()
   }

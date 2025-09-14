@@ -1,6 +1,21 @@
 import React from 'react'
 import { Shield, AlertTriangle } from 'lucide-react'
 
+/**
+ * Header Component
+ * 
+ * Displays the application header with branding, logo, and version information.
+ * Provides consistent navigation and branding across the application.
+ * 
+ * @fileoverview Application header component with branding and navigation
+ * @author RetailReady Team
+ * @version 1.0.0
+ * 
+ * @returns JSX element containing the application header
+ * 
+ * @example
+ * <Header />
+ */
 export const Header: React.FC = () => {
   return (
     <header className="bg-white border-b shadow-sm">

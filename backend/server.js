@@ -1,353 +1,292 @@
+/**
+ * RetailReady Backend Server
+ * 
+ * This is the main server file for the RetailReady compliance management system.
+ * It initializes the Express application, sets up middleware, routes, and
+ * manages the application lifecycle.
+ * 
+ * @fileoverview Main server application for RetailReady backend
+ * @author RetailReady Team
+ * @version 1.0.0
+ */
+
 const express = require('express');
 const cors = require('cors');
-const multer = require('multer');
-const pdfParse = require('pdf-parse');
-const OpenAI = require('openai');
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 require('dotenv').config();
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+// Import configuration and services
+const { initializeCompleteDatabase, closeDatabase } = require('./config/database');
 
-// Initialize OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Import route handlers
+const createViolationsRouter = require('./routes/violations');
+const createUploadRouter = require('./routes/upload');
+const createRiskRouter = require('./routes/risk');
 
-// Initialize SQLite database
-const db = new sqlite3.Database('./compliance.db');
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static('uploads'));
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+/**
+ * Application configuration
+ */
+const config = {
+  port: process.env.PORT || 3001,
+  environment: process.env.NODE_ENV || 'development',
+  corsOptions: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true
   }
-});
+};
 
-const upload = multer({ 
-  storage: storage,
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF files are allowed'), false);
+/**
+ * Application class
+ * Manages the Express application lifecycle and configuration
+ */
+class RetailReadyServer {
+  constructor() {
+    this.app = express();
+    this.server = null;
+    this.db = null;
+  }
+
+  /**
+   * Initialize the Express application
+   * Sets up middleware, routes, and error handling
+   * 
+   * @returns {Promise<void>}
+   */
+  async initialize() {
+    try {
+      console.log('🚀 Initializing RetailReady server...');
+      
+      // Initialize database
+      console.log('📊 Initializing database...');
+      this.db = await initializeCompleteDatabase();
+      
+      // Setup middleware
+      this.setupMiddleware();
+      
+      // Setup routes
+      this.setupRoutes();
+      
+      // Setup error handling
+      this.setupErrorHandling();
+      
+      console.log('✅ Server initialization completed');
+    } catch (error) {
+      console.error('❌ Server initialization failed:', error);
+      throw error;
     }
   }
-});
 
-// Initialize database tables
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS violations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    requirement TEXT NOT NULL,
-    violation TEXT NOT NULL,
-    fine TEXT NOT NULL,
-    category TEXT NOT NULL,
-    severity TEXT NOT NULL,
-    retailer TEXT DEFAULT 'Unknown',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
-});
-
-// Seed data for Dick's Sporting Goods
-const seedData = [
-  {
-    requirement: "UCC-128 labels must be 2 inches from bottom/right edge",
-    violation: "Label placement incorrect",
-    fine: "$2/carton + $250",
-    category: "Labeling",
-    severity: "High"
-  },
-  {
-    requirement: "ASN must be sent 24 hours before shipment",
-    violation: "Late ASN submission",
-    fine: "$500 per occurrence",
-    category: "ASN",
-    severity: "Medium"
-  },
-  {
-    requirement: "Cartons must be stacked no more than 6 high",
-    violation: "Overstacked cartons",
-    fine: "$1/carton over limit",
-    category: "Packaging",
-    severity: "Medium"
-  },
-  {
-    requirement: "All items must have proper UPC codes",
-    violation: "Missing or incorrect UPC",
-    fine: "$5/item + $100 processing fee",
-    category: "Labeling",
-    severity: "High"
-  },
-  {
-    requirement: "Shipments must arrive within 2-hour delivery window",
-    violation: "Late delivery",
-    fine: "$200/hour late + $50 rescheduling fee",
-    category: "Delivery",
-    severity: "High"
-  },
-  {
-    requirement: "Packaging must meet minimum crush resistance standards",
-    violation: "Insufficient packaging protection",
-    fine: "$10/carton + $500 inspection fee",
-    category: "Packaging",
-    severity: "Medium"
-  }
-];
-
-// Seed the database if empty
-db.get("SELECT COUNT(*) as count FROM violations", (err, row) => {
-  if (err) {
-    console.error('Error checking database:', err);
-  } else if (row.count === 0) {
-    console.log('Seeding database with Dick\'s Sporting Goods compliance data...');
-    const stmt = db.prepare("INSERT INTO violations (requirement, violation, fine, category, severity, retailer) VALUES (?, ?, ?, ?, ?, ?)");
-    seedData.forEach(item => {
-      stmt.run([item.requirement, item.violation, item.fine, item.category, item.severity, "Dick's Sporting Goods"]);
+  /**
+   * Setup Express middleware
+   * Configures CORS, JSON parsing, and static file serving
+   */
+  setupMiddleware() {
+    console.log('⚙️ Setting up middleware...');
+    
+    // CORS configuration
+    this.app.use(cors(config.corsOptions));
+    
+    // JSON body parsing
+    this.app.use(express.json({ limit: '10mb' }));
+    
+    // URL-encoded body parsing
+    this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+    
+    // Static file serving for uploads
+    this.app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+    
+    // Request logging middleware
+    this.app.use((req, res, next) => {
+      console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+      next();
     });
-    stmt.finalize();
-    console.log('Database seeded successfully!');
+    
+    console.log('✅ Middleware setup completed');
   }
-});
 
-// AI parsing function
-async function parseComplianceData(pdfText) {
-  try {
-    const prompt = `
-    Parse the following retailer compliance guide text and extract compliance requirements, violations, and fine structures. 
-    Return the data in JSON format with this structure:
+  /**
+   * Setup application routes
+   * Configures all API endpoints and route handlers
+   */
+  setupRoutes() {
+    console.log('🛣️ Setting up routes...');
     
-    {
-      "requirements": [
-        {
-          "requirement": "specific requirement text",
-          "violation": "what constitutes a violation",
-          "fine": "fine amount and structure",
-          "category": "category like Labeling, ASN, Packaging, Delivery",
-          "severity": "High, Medium, or Low"
-        }
-      ]
-    }
-    
-    Text to parse:
-    ${pdfText.substring(0, 4000)} // Limit to avoid token limits
-    `;
+    // Health check endpoint
+    this.app.get('/api/health', (req, res) => {
+      res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        environment: config.environment,
+        version: '1.0.0'
+      });
+    });
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert at parsing retailer compliance documents and extracting structured data about requirements, violations, and fines."
+    // API information endpoint
+    this.app.get('/api', (req, res) => {
+      res.json({
+        message: 'RetailReady API',
+        version: '1.0.0',
+        environment: config.environment,
+        endpoints: {
+          'GET /api/health': 'Health check',
+          'GET /api': 'API information',
+          'GET /api/violations': 'Get all compliance violations',
+          'GET /api/violations/:id': 'Get specific violation by ID',
+          'GET /api/violations/categories': 'Get available categories',
+          'GET /api/violations/retailers': 'Get available retailers',
+          'GET /api/violations/database-view': 'Get organized database view',
+          'GET /api/violations/database-view/:retailer/:category': 'Get detailed view for specific retailer/category',
+          'GET /api/violations/stats': 'Get database statistics',
+          'POST /api/upload': 'Upload and parse PDF compliance guide',
+          'POST /api/upload/validate': 'Validate PDF file without processing',
+          'GET /api/upload/info': 'Get upload requirements',
+          'POST /api/risk/score': 'Calculate risk score for violation',
+          'POST /api/risk/batch': 'Calculate risk scores for multiple violations',
+          'POST /api/risk/estimate': 'Estimate fine without database lookup',
+          'GET /api/risk/config': 'Get risk calculation configuration'
         },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.1,
+        status: 'OK',
+        timestamp: new Date().toISOString()
+      });
     });
 
-    const content = response.choices[0].message.content;
-    // Clean up the response in case it's wrapped in markdown code blocks
-    const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
-    const parsedData = JSON.parse(cleanContent);
-    return parsedData.requirements || [];
-  } catch (error) {
-    console.error('Error parsing with OpenAI:', error);
-    throw new Error('Failed to parse compliance data');
+    // Setup route handlers with database connection
+    this.app.use('/api/violations', createViolationsRouter(this.db));
+    this.app.use('/api/upload', createUploadRouter(this.db));
+    this.app.use('/api/risk', createRiskRouter(this.db));
+
+    // 404 handler for undefined routes
+    this.app.use('*', (req, res) => {
+      res.status(404).json({
+        error: 'Route not found',
+        message: `The requested route ${req.method} ${req.originalUrl} was not found`,
+        availableRoutes: '/api'
+      });
+    });
+    
+    console.log('✅ Routes setup completed');
+  }
+
+  /**
+   * Setup error handling middleware
+   * Configures global error handling for the application
+   */
+  setupErrorHandling() {
+    console.log('🛡️ Setting up error handling...');
+    
+    // Global error handler
+    this.app.use((error, req, res, next) => {
+      console.error('❌ Unhandled error:', error);
+      
+      // Handle specific error types
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res.status(413).json({
+          error: 'File too large',
+          message: 'The uploaded file exceeds the maximum allowed size'
+        });
+      }
+      
+      if (error.code === 'INVALID_FILE_TYPE') {
+        return res.status(400).json({
+          error: 'Invalid file type',
+          message: 'Only PDF files are allowed'
+        });
+      }
+      
+      // Generic error response
+      res.status(500).json({
+        error: 'Internal server error',
+        message: config.environment === 'development' ? error.message : 'An unexpected error occurred'
+      });
+    });
+    
+    console.log('✅ Error handling setup completed');
+  }
+
+  /**
+   * Start the server
+   * Begins listening for incoming connections
+   * 
+   * @returns {Promise<void>}
+   */
+  async start() {
+    try {
+      await this.initialize();
+      
+      this.server = this.app.listen(config.port, () => {
+        console.log('🚀 RetailReady backend server running on port', config.port);
+        console.log('📊 API endpoints available at http://localhost:' + config.port + '/api');
+        console.log('🌍 Environment:', config.environment);
+        console.log('📋 Health check: http://localhost:' + config.port + '/api/health');
+      });
+      
+    } catch (error) {
+      console.error('❌ Failed to start server:', error);
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Stop the server gracefully
+   * Closes database connections and stops the server
+   * 
+   * @returns {Promise<void>}
+   */
+  async stop() {
+    console.log('🛑 Shutting down server...');
+    
+    return new Promise((resolve) => {
+      if (this.server) {
+        this.server.close(async () => {
+          console.log('✅ HTTP server closed');
+          
+          if (this.db) {
+            await closeDatabase(this.db);
+          }
+          
+          console.log('✅ Server shutdown completed');
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
   }
 }
 
-// API Routes
+/**
+ * Create and start the server instance
+ */
+const server = new RetailReadyServer();
 
-// Upload and parse PDF
-app.post('/api/upload', upload.single('pdf'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No PDF file uploaded' });
-    }
-
-    // Extract text from PDF
-    const pdfBuffer = require('fs').readFileSync(req.file.path);
-    const pdfData = await pdfParse(pdfBuffer);
-    
-    // Parse with AI
-    const requirements = await parseComplianceData(pdfData.text);
-    
-    // Store in database
-    const stmt = db.prepare("INSERT INTO violations (requirement, violation, fine, category, severity, retailer) VALUES (?, ?, ?, ?, ?, ?)");
-    requirements.forEach(req => {
-      stmt.run([req.requirement, req.violation, req.fine, req.category, req.severity, "Uploaded Document"]);
-    });
-    stmt.finalize();
-
-    // Clean up uploaded file
-    require('fs').unlinkSync(req.file.path);
-
-    res.json({ 
-      success: true, 
-      requirements: requirements,
-      message: `Successfully parsed ${requirements.length} requirements`
-    });
-
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: error.message });
-  }
+// Handle graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Received SIGINT, shutting down gracefully...');
+  await server.stop();
+  process.exit(0);
 });
 
-// Get all violations
-app.get('/api/violations', (req, res) => {
-  const { category, severity, retailer } = req.query;
-  
-  let query = "SELECT * FROM violations WHERE 1=1";
-  const params = [];
-  
-  if (category) {
-    query += " AND category = ?";
-    params.push(category);
-  }
-  
-  if (severity) {
-    query += " AND severity = ?";
-    params.push(severity);
-  }
-  
-  if (retailer) {
-    query += " AND retailer = ?";
-    params.push(retailer);
-  }
-  
-  query += " ORDER BY created_at DESC";
-
-  db.all(query, params, (err, rows) => {
-    if (err) {
-      console.error('Database error:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
-    res.json(rows);
-  });
+process.on('SIGTERM', async () => {
+  console.log('\n🛑 Received SIGTERM, shutting down gracefully...');
+  await server.stop();
+  process.exit(0);
 });
 
-// Get categories for filtering
-app.get('/api/categories', (req, res) => {
-  db.all("SELECT DISTINCT category FROM violations ORDER BY category", (err, rows) => {
-    if (err) {
-      console.error('Database error:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
-    res.json(rows.map(row => row.category));
-  });
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
 });
 
-// Calculate risk score
-app.post('/api/risk-score', (req, res) => {
-  const { violationId, units } = req.body;
-  
-  if (!violationId || !units) {
-    return res.status(400).json({ error: 'violationId and units are required' });
-  }
-
-  db.get("SELECT * FROM violations WHERE id = ?", [violationId], (err, row) => {
-    if (err) {
-      console.error('Database error:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
-    
-    if (!row) {
-      return res.status(404).json({ error: 'Violation not found' });
-    }
-
-    // Simple risk calculation based on fine structure
-    let estimatedFine = 0;
-    const fineText = row.fine.toLowerCase();
-    
-    if (fineText.includes('per carton') || fineText.includes('/carton')) {
-      const perCartonMatch = fineText.match(/\$(\d+)\/carton/);
-      if (perCartonMatch) {
-        estimatedFine += parseInt(perCartonMatch[1]) * units;
-      }
-    }
-    
-    if (fineText.includes('per item') || fineText.includes('/item')) {
-      const perItemMatch = fineText.match(/\$(\d+)\/item/);
-      if (perItemMatch) {
-        estimatedFine += parseInt(perItemMatch[1]) * units;
-      }
-    }
-    
-    if (fineText.includes('per occurrence') || fineText.includes('per hour')) {
-      const perOccurrenceMatch = fineText.match(/\$(\d+)/);
-      if (perOccurrenceMatch) {
-        estimatedFine += parseInt(perOccurrenceMatch[1]);
-      }
-    }
-    
-    // Add base fees
-    if (fineText.includes('processing fee') || fineText.includes('inspection fee')) {
-      const feeMatch = fineText.match(/\$(\d+)\s+(?:processing|inspection)\s+fee/);
-      if (feeMatch) {
-        estimatedFine += parseInt(feeMatch[1]);
-      }
-    }
-
-    res.json({
-      violation: row,
-      units: units,
-      estimatedFine: estimatedFine,
-      severity: row.severity,
-      riskLevel: estimatedFine > 1000 ? 'High' : estimatedFine > 500 ? 'Medium' : 'Low'
-    });
-  });
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
 
-// API root endpoint - shows available routes
-app.get('/api', (req, res) => {
-  res.json({
-    message: 'RetailReady API',
-    version: '1.0.0',
-    endpoints: {
-      'GET /api/violations': 'Get all compliance violations',
-      'GET /api/categories': 'Get available categories',
-      'POST /api/upload': 'Upload and parse PDF compliance guide',
-      'POST /api/risk-score': 'Calculate risk score for violation',
-      'GET /api/health': 'Health check'
-    },
-    status: 'OK',
-    timestamp: new Date().toISOString()
-  });
+// Start the server
+server.start().catch((error) => {
+  console.error('❌ Failed to start application:', error);
+  process.exit(1);
 });
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 RetailReady backend server running on port ${PORT}`);
-  console.log(`📊 API endpoints available at http://localhost:${PORT}/api`);
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n🛑 Shutting down server...');
-  db.close((err) => {
-    if (err) {
-      console.error('Error closing database:', err);
-    } else {
-      console.log('✅ Database connection closed');
-    }
-    process.exit(0);
-  });
-});
-
+module.exports = RetailReadyServer;
