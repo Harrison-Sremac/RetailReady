@@ -93,43 +93,73 @@ const dbConfig = {
       requirement: "UCC-128 labels must be 2 inches from bottom/right edge",
       violation: "Label placement incorrect",
       fine: "$2/carton + $250",
-      category: "Labeling",
-      severity: "High"
+      category: "Post-Packing",
+      severity: "High",
+      fine_amount: 2,
+      fine_unit: "per carton",
+      additional_fees: "$250 flat fee",
+      prevention_method: "Label placement guides",
+      responsible_party: "Warehouse Worker"
     },
     {
       requirement: "ASN must be sent 24 hours before shipment",
       violation: "Late ASN submission",
       fine: "$500 per occurrence",
-      category: "ASN",
-      severity: "Medium"
+      category: "EDI/Digital",
+      severity: "Medium",
+      fine_amount: 500,
+      fine_unit: "per occurrence",
+      additional_fees: null,
+      prevention_method: "Automated alerts",
+      responsible_party: "IT System"
     },
     {
       requirement: "Cartons must be stacked no more than 6 high",
       violation: "Overstacked cartons",
       fine: "$1/carton over limit",
-      category: "Packaging",
-      severity: "Medium"
+      category: "Pre-Packing",
+      severity: "Medium",
+      fine_amount: 1,
+      fine_unit: "per carton over limit",
+      additional_fees: null,
+      prevention_method: "Visual guides",
+      responsible_party: "Warehouse Worker"
     },
     {
       requirement: "All items must have proper UPC codes",
       violation: "Missing or incorrect UPC",
       fine: "$5/item + $100 processing fee",
-      category: "Labeling",
-      severity: "High"
+      category: "Pre-Packing",
+      severity: "High",
+      fine_amount: 5,
+      fine_unit: "per item",
+      additional_fees: "$100 processing fee",
+      prevention_method: "Order verification",
+      responsible_party: "Warehouse Worker"
     },
     {
       requirement: "Shipments must arrive within 2-hour delivery window",
       violation: "Late delivery",
       fine: "$200/hour late + $50 rescheduling fee",
-      category: "Delivery",
-      severity: "High"
+      category: "Carrier/Routing",
+      severity: "High",
+      fine_amount: 200,
+      fine_unit: "per hour late",
+      additional_fees: "$50 rescheduling fee",
+      prevention_method: "System validation",
+      responsible_party: "Logistics Coordinator"
     },
     {
       requirement: "Packaging must meet minimum crush resistance standards",
       violation: "Insufficient packaging protection",
       fine: "$10/carton + $500 inspection fee",
-      category: "Packaging",
-      severity: "Medium"
+      category: "During Packing",
+      severity: "Medium",
+      fine_amount: 10,
+      fine_unit: "per carton",
+      additional_fees: "$500 inspection fee",
+      prevention_method: "Quality checklists",
+      responsible_party: "Warehouse Worker"
     }
   ],
   
