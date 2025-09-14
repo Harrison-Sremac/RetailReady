@@ -2,6 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Violation, Filters } from '../types';
 import { violationsApi } from '../utils/api';
 import Advertisement from './Advertisement';
+import AdvertisementBanner from './AdvertisementBanner';
+import SidebarAd from './SidebarAd';
+import AdToggle from './AdToggle';
 
 /**
  * Robust App Component with Error Boundaries
@@ -23,6 +26,7 @@ function RobustApp() {
     frequency: string;
     results: any;
   } | null>(null);
+  const [showAds, setShowAds] = useState(true);
 
   // Test API connection on mount
   useEffect(() => {
@@ -197,6 +201,10 @@ function RobustApp() {
     }
   };
 
+  const toggleAds = () => {
+    setShowAds(!showAds);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -228,6 +236,9 @@ function RobustApp() {
           </div>
         </div>
 
+        {/* Advertisement Toggle */}
+        <AdToggle showAds={showAds} onToggle={toggleAds} />
+
         {/* Error Message */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -247,7 +258,7 @@ function RobustApp() {
         )}
 
         {/* Advertisement */}
-        <Advertisement />
+        {showAds && <Advertisement />}
 
         {/* Step 1: Upload Compliance Guide */}
         <section className="mb-8">
@@ -463,6 +474,16 @@ function RobustApp() {
           </div>
         </section>
 
+        {/* Advertisement Banner */}
+        {showAds && (
+          <AdvertisementBanner 
+            title="Smart Warehouse Management"
+            description="Optimize your warehouse operations with AI-powered insights. Reduce costs by 25% and improve efficiency with our advanced analytics platform."
+            ctaText="Get Demo"
+            backgroundColor="bg-gradient-to-r from-orange-600 to-red-600"
+          />
+        )}
+
         {/* Step 3: Risk Assessment Calculator */}
         <section className="mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -664,8 +685,10 @@ function RobustApp() {
             </div>
             
             {filteredViolations.length > 0 ? (
-              <div className="space-y-3">
-                {filteredViolations.slice(0, 10).map((violation) => (
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-3">
+                  <div className="space-y-3">
+                    {filteredViolations.slice(0, 10).map((violation) => (
                   <div key={violation.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -688,10 +711,19 @@ function RobustApp() {
                     </div>
                   </div>
                 ))}
-                {filteredViolations.length > 10 && (
-                  <p className="text-center text-sm text-gray-500 mt-4">
-                    Showing first 10 of {filteredViolations.length} requirements
-                  </p>
+                    {filteredViolations.length > 10 && (
+                      <p className="text-center text-sm text-gray-500 mt-4">
+                        Showing first 10 of {filteredViolations.length} requirements
+                      </p>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Sidebar Advertisement */}
+                {showAds && (
+                  <div className="lg:col-span-1">
+                    <SidebarAd />
+                  </div>
                 )}
               </div>
             ) : (
@@ -702,6 +734,17 @@ function RobustApp() {
             )}
           </div>
         </section>
+
+        {/* Bottom Advertisement */}
+        {showAds && (
+          <AdvertisementBanner 
+            title="Enterprise Compliance Solutions"
+            description="Scale your compliance management with our enterprise-grade platform. Trusted by Fortune 500 companies worldwide."
+            ctaText="Contact Sales"
+            backgroundColor="bg-gradient-to-r from-indigo-600 to-purple-600"
+            variant="horizontal"
+          />
+        )}
       </main>
     </div>
   );
