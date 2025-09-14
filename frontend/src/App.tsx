@@ -16,6 +16,7 @@ import { RiskCalculator } from './components/RiskCalculator';
 import { Header } from './components/Header';
 import { FilterBar } from './components/FilterBar';
 import { DatabaseView } from './components/DatabaseView';
+import { WorkerLeaderboard } from './components/WorkerLeaderboard';
 import { Violation, Filters } from './types';
 import { useViolations } from './hooks/useViolations';
 import { violationsApi } from './utils/api';
@@ -188,8 +189,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      
       <main className="container mx-auto px-4 py-8">
         {/* Step 1: Upload Compliance Guide */}
         <section className="mb-8">
@@ -282,6 +281,20 @@ function App() {
             </div>
           </section>
         )}
+
+        {/* Worker Performance Tracking */}
+        <section className="mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center mb-6">
+              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-green-600 font-semibold text-sm">👥</span>
+              </div>
+              <h2 className="text-xl font-semibold">Worker Performance Tracking</h2>
+            </div>
+            
+            <WorkerLeaderboard />
+          </div>
+        </section>
 
         {/* Step 3: Risk Assessment Calculator */}
         <section className="mb-8">

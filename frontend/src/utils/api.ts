@@ -125,15 +125,6 @@ export const violationsApi = {
   },
 
   /**
-   * Get database view organized by retailer and category
-   * 
-   * @returns Promise with database view data
-   */
-  async getDatabaseView(): Promise<ApiResponse<any>> {
-    return apiRequest<any>(API_CONFIG.ENDPOINTS.DATABASE_VIEW);
-  },
-
-  /**
    * Get detailed view for specific retailer/category
    * 
    * @param retailer - Retailer name

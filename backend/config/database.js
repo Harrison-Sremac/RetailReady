@@ -39,6 +39,46 @@ const dbConfig = {
         retailer TEXT DEFAULT 'Unknown',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
+    `,
+    workers: `
+      CREATE TABLE IF NOT EXISTS workers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        worker_id TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        department TEXT DEFAULT 'Warehouse',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `,
+    worker_scans: `
+      CREATE TABLE IF NOT EXISTS worker_scans (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        worker_id TEXT NOT NULL,
+        order_barcode TEXT NOT NULL,
+        sku TEXT,
+        carton_id TEXT,
+        order_type TEXT,
+        retailer TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        status TEXT DEFAULT 'in_progress',
+        violations_prevented TEXT,
+        violations_occurred TEXT,
+        estimated_fine_saved REAL DEFAULT 0,
+        estimated_fine_incurred REAL DEFAULT 0,
+        FOREIGN KEY (worker_id) REFERENCES workers(worker_id)
+      )
+    `,
+    order_guidance: `
+      CREATE TABLE IF NOT EXISTS order_guidance (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_barcode TEXT UNIQUE NOT NULL,
+        retailer TEXT NOT NULL,
+        order_type TEXT NOT NULL,
+        guidance_steps TEXT NOT NULL,
+        visual_guides TEXT,
+        warnings TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
     `
   },
   
@@ -86,6 +126,25 @@ const dbConfig = {
       category: "Packaging",
       severity: "Medium"
     }
+  ],
+  
+  // Seed data for workers
+  workerSeedData: [
+    {
+      worker_id: "maria123",
+      name: "Maria Rodriguez",
+      department: "Warehouse"
+    },
+    {
+      worker_id: "john456",
+      name: "John Smith",
+      department: "Warehouse"
+    },
+    {
+      worker_id: "sarah789",
+      name: "Sarah Johnson",
+      department: "Packaging"
+    }
   ]
 };
 
@@ -112,15 +171,24 @@ function initializeDatabase() {
 function createTables(db) {
   return new Promise((resolve, reject) => {
     db.serialize(() => {
-      // Create violations table
-      db.run(dbConfig.schemas.violations, (err) => {
-        if (err) {
-          console.error('Error creating violations table:', err);
-          reject(err);
-        } else {
-          console.log('Violations table created/verified');
-          resolve();
-        }
+      let tablesCreated = 0;
+      const totalTables = Object.keys(dbConfig.schemas).length;
+      
+      // Create all tables
+      Object.entries(dbConfig.schemas).forEach(([tableName, schema]) => {
+        db.run(schema, (err) => {
+          if (err) {
+            console.error(`Error creating ${tableName} table:`, err);
+            reject(err);
+          } else {
+            console.log(`${tableName} table created/verified`);
+            tablesCreated++;
+            
+            if (tablesCreated === totalTables) {
+              resolve();
+            }
+          }
+        });
       });
     });
   });
@@ -145,13 +213,13 @@ function seedDatabase(db) {
       if (row.count === 0) {
         console.log('Seeding database with Dick\'s Sporting Goods compliance data...');
         
-        const stmt = db.prepare(`
+        const violationStmt = db.prepare(`
           INSERT INTO violations (requirement, violation, fine, category, severity, retailer) 
           VALUES (?, ?, ?, ?, ?, ?)
         `);
         
         dbConfig.seedData.forEach(item => {
-          stmt.run([
+          violationStmt.run([
             item.requirement, 
             item.violation, 
             item.fine, 
@@ -161,13 +229,40 @@ function seedDatabase(db) {
           ]);
         });
         
-        stmt.finalize();
-        console.log('Database seeded successfully!');
+        violationStmt.finalize();
+        console.log('Violations seeded successfully!');
       } else {
-        console.log('Database already contains data, skipping seed');
+        console.log('Violations already contain data, skipping seed');
       }
       
-      resolve();
+      // Seed workers
+      db.get("SELECT COUNT(*) as count FROM workers", (err, row) => {
+        if (err) {
+          console.error('Error checking workers table:', err);
+          reject(err);
+          return;
+        }
+        
+        if (row.count === 0) {
+          console.log('Seeding workers...');
+          
+          const workerStmt = db.prepare(`
+            INSERT INTO workers (worker_id, name, department) 
+            VALUES (?, ?, ?)
+          `);
+          
+          dbConfig.workerSeedData.forEach(worker => {
+            workerStmt.run([worker.worker_id, worker.name, worker.department]);
+          });
+          
+          workerStmt.finalize();
+          console.log('Workers seeded successfully!');
+        } else {
+          console.log('Workers already contain data, skipping seed');
+        }
+        
+        resolve();
+      });
     });
   });
 }
