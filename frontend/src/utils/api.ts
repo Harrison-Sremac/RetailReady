@@ -116,6 +116,15 @@ export const violationsApi = {
   },
 
   /**
+   * Get organized database view by retailer and category
+   * 
+   * @returns Promise with database view data
+   */
+  async getDatabaseView(): Promise<ApiResponse<any>> {
+    return apiRequest<any>(API_CONFIG.ENDPOINTS.DATABASE_VIEW);
+  },
+
+  /**
    * Get database view organized by retailer and category
    * 
    * @returns Promise with database view data

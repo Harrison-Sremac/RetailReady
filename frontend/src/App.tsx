@@ -15,6 +15,7 @@ import { ViolationsList } from './components/ViolationsList';
 import { RiskCalculator } from './components/RiskCalculator';
 import { Header } from './components/Header';
 import { FilterBar } from './components/FilterBar';
+import { DatabaseView } from './components/DatabaseView';
 import { Violation, Filters } from './types';
 import { useViolations } from './hooks/useViolations';
 import { violationsApi } from './utils/api';
@@ -277,13 +278,7 @@ function App() {
         {appState.showDatabaseView && (
           <section className="mb-8">
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-xl font-semibold mb-4">Database Overview</h2>
-              <div className="text-center py-8 text-gray-500">
-                <p>Database view functionality will be implemented here</p>
-                <p className="text-sm mt-2">
-                  This will show organized data by retailer and category
-                </p>
-              </div>
+              <DatabaseView />
             </div>
           </section>
         )}
