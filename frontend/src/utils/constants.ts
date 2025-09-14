@@ -50,7 +50,7 @@ export const SEVERITY_CONFIG = {
     bgColor: 'bg-red-100',
     textColor: 'text-red-800',
     borderColor: 'border-red-200',
-    icon: '🔴',
+    icon: '●',
     description: 'High Risk'
   },
   [SEVERITY_LEVELS.MEDIUM]: {
@@ -58,7 +58,7 @@ export const SEVERITY_CONFIG = {
     bgColor: 'bg-yellow-100',
     textColor: 'text-yellow-800',
     borderColor: 'border-yellow-200',
-    icon: '🟡',
+    icon: '●',
     description: 'Medium Risk'
   },
   [SEVERITY_LEVELS.LOW]: {
@@ -66,7 +66,7 @@ export const SEVERITY_CONFIG = {
     bgColor: 'bg-green-100',
     textColor: 'text-green-800',
     borderColor: 'border-green-200',
-    icon: '🟢',
+    icon: '●',
     description: 'Low Risk'
   }
 } as const;

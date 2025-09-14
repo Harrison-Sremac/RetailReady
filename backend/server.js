@@ -54,10 +54,10 @@ class RetailReadyServer {
    */
   async initialize() {
     try {
-      console.log('🚀 Initializing RetailReady server...');
+      console.log('Initializing RetailReady server...');
       
       // Initialize database
-      console.log('📊 Initializing database...');
+      console.log('Initializing database...');
       this.db = await initializeCompleteDatabase();
       
       // Setup middleware
@@ -69,9 +69,9 @@ class RetailReadyServer {
       // Setup error handling
       this.setupErrorHandling();
       
-      console.log('✅ Server initialization completed');
+      console.log('Server initialization completed');
     } catch (error) {
-      console.error('❌ Server initialization failed:', error);
+      console.error('Server initialization failed:', error);
       throw error;
     }
   }
@@ -81,7 +81,7 @@ class RetailReadyServer {
    * Configures CORS, JSON parsing, and static file serving
    */
   setupMiddleware() {
-    console.log('⚙️ Setting up middleware...');
+    console.log('Setting up middleware...');
     
     // CORS configuration
     this.app.use(cors(config.corsOptions));
@@ -101,7 +101,7 @@ class RetailReadyServer {
       next();
     });
     
-    console.log('✅ Middleware setup completed');
+    console.log('Middleware setup completed');
   }
 
   /**
@@ -109,7 +109,7 @@ class RetailReadyServer {
    * Configures all API endpoints and route handlers
    */
   setupRoutes() {
-    console.log('🛣️ Setting up routes...');
+    console.log('Setting up routes...');
     
     // Health check endpoint
     this.app.get('/api/health', (req, res) => {
@@ -164,7 +164,7 @@ class RetailReadyServer {
       });
     });
     
-    console.log('✅ Routes setup completed');
+    console.log('Routes setup completed');
   }
 
   /**
@@ -172,11 +172,11 @@ class RetailReadyServer {
    * Configures global error handling for the application
    */
   setupErrorHandling() {
-    console.log('🛡️ Setting up error handling...');
+    console.log('Setting up error handling...');
     
     // Global error handler
     this.app.use((error, req, res, next) => {
-      console.error('❌ Unhandled error:', error);
+      console.error('Unhandled error:', error);
       
       // Handle specific error types
       if (error.code === 'LIMIT_FILE_SIZE') {
@@ -200,7 +200,7 @@ class RetailReadyServer {
       });
     });
     
-    console.log('✅ Error handling setup completed');
+    console.log('Error handling setup completed');
   }
 
   /**
@@ -214,14 +214,14 @@ class RetailReadyServer {
       await this.initialize();
       
       this.server = this.app.listen(config.port, () => {
-        console.log('🚀 RetailReady backend server running on port', config.port);
-        console.log('📊 API endpoints available at http://localhost:' + config.port + '/api');
-        console.log('🌍 Environment:', config.environment);
-        console.log('📋 Health check: http://localhost:' + config.port + '/api/health');
+        console.log('RetailReady backend server running on port', config.port);
+        console.log('API endpoints available at http://localhost:' + config.port + '/api');
+        console.log('Environment:', config.environment);
+        console.log('Health check: http://localhost:' + config.port + '/api/health');
       });
       
     } catch (error) {
-      console.error('❌ Failed to start server:', error);
+      console.error('Failed to start server:', error);
       process.exit(1);
     }
   }
@@ -233,18 +233,18 @@ class RetailReadyServer {
    * @returns {Promise<void>}
    */
   async stop() {
-    console.log('🛑 Shutting down server...');
+    console.log('Shutting down server...');
     
     return new Promise((resolve) => {
       if (this.server) {
         this.server.close(async () => {
-          console.log('✅ HTTP server closed');
+          console.log('HTTP server closed');
           
           if (this.db) {
             await closeDatabase(this.db);
           }
           
-          console.log('✅ Server shutdown completed');
+          console.log('Server shutdown completed');
           resolve();
         });
       } else {
@@ -261,31 +261,31 @@ const server = new RetailReadyServer();
 
 // Handle graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('\n🛑 Received SIGINT, shutting down gracefully...');
+  console.log('\nReceived SIGINT, shutting down gracefully...');
   await server.stop();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  console.log('\n🛑 Received SIGTERM, shutting down gracefully...');
+  console.log('\nReceived SIGTERM, shutting down gracefully...');
   await server.stop();
   process.exit(0);
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  console.error('❌ Uncaught Exception:', error);
+  console.error('Uncaught Exception:', error);
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   process.exit(1);
 });
 
 // Start the server
 server.start().catch((error) => {
-  console.error('❌ Failed to start application:', error);
+  console.error('Failed to start application:', error);
   process.exit(1);
 });
 

@@ -11,8 +11,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { UploadZone } from './components/UploadZone';
-import { ViolationsList } from './components/ViolationsList-refactored';
-import { RiskCalculator } from './components/RiskCalculator-refactored';
+import { ViolationsList } from './components/ViolationsList';
+import { RiskCalculator } from './components/RiskCalculator';
 import { Header } from './components/Header';
 import { FilterBar } from './components/FilterBar';
 import { Violation, Filters } from './types';
@@ -170,7 +170,7 @@ function App() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-red-600 text-xl">⚠️</span>
+            <span className="text-red-600 text-xl">!</span>
           </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Application Error</h2>
           <p className="text-gray-600 mb-4">{error}</p>

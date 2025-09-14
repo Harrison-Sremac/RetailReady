@@ -66,7 +66,7 @@ function createRiskRouter(db) {
         });
       }
 
-      console.log('🎯 Calculating risk score for violation:', violationId, 'units:', units);
+      console.log('Calculating risk score for violation:', violationId, 'units:', units);
 
       // Get violation from database
       const violation = await dbService.getViolationById(parseInt(violationId));
@@ -81,7 +81,7 @@ function createRiskRouter(db) {
       // Calculate risk assessment
       const assessment = riskService.calculateRiskAssessment(violation, parseInt(units));
 
-      console.log('✅ Risk calculation completed:', {
+      console.log('Risk calculation completed:', {
         violationId: violationId,
         estimatedFine: assessment.estimatedFine,
         riskLevel: assessment.riskLevel
@@ -90,7 +90,7 @@ function createRiskRouter(db) {
       res.json(assessment);
 
     } catch (error) {
-      console.error('❌ Risk calculation error:', error);
+      console.error('Risk calculation error:', error);
       res.status(500).json({ 
         error: 'Risk calculation failed',
         message: error.message 
@@ -131,7 +131,7 @@ function createRiskRouter(db) {
         });
       }
 
-      console.log('🎯 Calculating batch risk scores for', violations.length, 'violations');
+      console.log('Calculating batch risk scores for', violations.length, 'violations');
 
       // Get all violations from database
       const violationPromises = violations.map(id => dbService.getViolationById(parseInt(id)));
@@ -150,7 +150,7 @@ function createRiskRouter(db) {
       // Calculate risk statistics
       const statistics = riskService.getRiskStatistics(validViolations, parseInt(units));
 
-      console.log('✅ Batch risk calculation completed:', {
+      console.log('Batch risk calculation completed:', {
         totalViolations: statistics.totalViolations,
         totalEstimatedFine: statistics.totalEstimatedFine,
         averageFine: statistics.averageFine
@@ -164,7 +164,7 @@ function createRiskRouter(db) {
       });
 
     } catch (error) {
-      console.error('❌ Batch risk calculation error:', error);
+      console.error('Batch risk calculation error:', error);
       res.status(500).json({ 
         error: 'Batch risk calculation failed',
         message: error.message 
@@ -214,13 +214,13 @@ function createRiskRouter(db) {
         });
       }
 
-      console.log('💰 Estimating fine for violation:', violation.fine, 'units:', units);
+      console.log('Estimating fine for violation:', violation.fine, 'units:', units);
 
       // Calculate estimated fine
       const estimatedFine = riskService.calculateEstimatedFine(violation.fine, parseInt(units));
       const riskLevel = riskService.determineRiskLevel(estimatedFine);
 
-      console.log('✅ Fine estimation completed:', {
+      console.log('Fine estimation completed:', {
         estimatedFine: estimatedFine,
         riskLevel: riskLevel
       });
@@ -237,7 +237,7 @@ function createRiskRouter(db) {
       });
 
     } catch (error) {
-      console.error('❌ Fine estimation error:', error);
+      console.error('Fine estimation error:', error);
       res.status(500).json({ 
         error: 'Fine estimation failed',
         message: error.message 

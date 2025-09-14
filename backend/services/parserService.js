@@ -87,7 +87,7 @@ async function parseComplianceData(pdfText) {
     // Create the user prompt with the PDF text
     const userPrompt = parserConfig.userPromptTemplate.replace('{text}', truncatedText);
     
-    console.log('🤖 Sending request to OpenAI for compliance parsing...');
+    console.log('Sending request to OpenAI for compliance parsing...');
     
     // Make request to OpenAI
     const response = await openai.chat.completions.create({
@@ -109,7 +109,7 @@ async function parseComplianceData(pdfText) {
     const content = response.choices[0].message.content;
     const cleanContent = content.replace(/```json\n?|\n?```/g, '').trim();
     
-    console.log('✅ OpenAI parsing completed successfully');
+    console.log('OpenAI parsing completed successfully');
     
     // Parse the JSON response
     const parsedData = JSON.parse(cleanContent);
@@ -133,12 +133,12 @@ async function parseComplianceData(pdfText) {
       return req;
     });
     
-    console.log(`📋 Successfully parsed ${validatedRequirements.length} compliance requirements`);
+    console.log(`Successfully parsed ${validatedRequirements.length} compliance requirements`);
     
     return validatedRequirements;
     
   } catch (error) {
-    console.error('❌ Error parsing with OpenAI:', error);
+    console.error('Error parsing with OpenAI:', error);
     
     // Provide more specific error messages
     if (error.code === 'insufficient_quota') {

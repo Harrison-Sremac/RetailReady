@@ -47,13 +47,13 @@ function createViolationsRouter(db) {
       if (severity) filters.severity = severity;
       if (retailer) filters.retailer = retailer;
       
-      console.log('📋 Fetching violations with filters:', filters);
+      console.log('Fetching violations with filters:', filters);
       
       const violations = await dbService.getViolations(filters);
       
       res.json(violations);
     } catch (error) {
-      console.error('❌ Error fetching violations:', error);
+      console.error('Error fetching violations:', error);
       res.status(500).json({ 
         error: 'Failed to fetch violations',
         message: error.message 
@@ -83,7 +83,7 @@ function createViolationsRouter(db) {
         });
       }
       
-      console.log('📋 Fetching violation with ID:', id);
+      console.log('Fetching violation with ID:', id);
       
       const violation = await dbService.getViolationById(parseInt(id));
       
@@ -96,7 +96,7 @@ function createViolationsRouter(db) {
       
       res.json(violation);
     } catch (error) {
-      console.error('❌ Error fetching violation:', error);
+      console.error('Error fetching violation:', error);
       res.status(500).json({ 
         error: 'Failed to fetch violation',
         message: error.message 
@@ -116,13 +116,13 @@ function createViolationsRouter(db) {
    */
   router.get('/categories', async (req, res) => {
     try {
-      console.log('📋 Fetching categories');
+      console.log('Fetching categories');
       
       const categories = await dbService.getCategories();
       
       res.json(categories);
     } catch (error) {
-      console.error('❌ Error fetching categories:', error);
+      console.error('Error fetching categories:', error);
       res.status(500).json({ 
         error: 'Failed to fetch categories',
         message: error.message 
@@ -142,13 +142,13 @@ function createViolationsRouter(db) {
    */
   router.get('/retailers', async (req, res) => {
     try {
-      console.log('📋 Fetching retailers');
+      console.log('Fetching retailers');
       
       const retailers = await dbService.getRetailers();
       
       res.json(retailers);
     } catch (error) {
-      console.error('❌ Error fetching retailers:', error);
+      console.error('Error fetching retailers:', error);
       res.status(500).json({ 
         error: 'Failed to fetch retailers',
         message: error.message 
@@ -168,7 +168,7 @@ function createViolationsRouter(db) {
    */
   router.get('/database-view', async (req, res) => {
     try {
-      console.log('📊 Fetching database view');
+      console.log('Fetching database view');
       
       const databaseView = await dbService.getDatabaseView();
       
@@ -178,7 +178,7 @@ function createViolationsRouter(db) {
         data: databaseView
       });
     } catch (error) {
-      console.error('❌ Error fetching database view:', error);
+      console.error('Error fetching database view:', error);
       res.status(500).json({ 
         error: 'Failed to fetch database view',
         message: error.message 
@@ -208,7 +208,7 @@ function createViolationsRouter(db) {
         });
       }
       
-      console.log('📊 Fetching detailed view for:', { retailer, category });
+      console.log('Fetching detailed view for:', { retailer, category });
       
       const violations = await dbService.getViolationsByRetailerAndCategory(retailer, category);
       
@@ -226,7 +226,7 @@ function createViolationsRouter(db) {
         violations: violations
       });
     } catch (error) {
-      console.error('❌ Error fetching detailed view:', error);
+      console.error('Error fetching detailed view:', error);
       res.status(500).json({ 
         error: 'Failed to fetch detailed view',
         message: error.message 
@@ -246,7 +246,7 @@ function createViolationsRouter(db) {
    */
   router.get('/stats', async (req, res) => {
     try {
-      console.log('📊 Fetching database statistics');
+      console.log('Fetching database statistics');
       
       const stats = await dbService.getDatabaseStats();
       
@@ -255,7 +255,7 @@ function createViolationsRouter(db) {
         stats: stats
       });
     } catch (error) {
-      console.error('❌ Error fetching statistics:', error);
+      console.error('Error fetching statistics:', error);
       res.status(500).json({ 
         error: 'Failed to fetch statistics',
         message: error.message 

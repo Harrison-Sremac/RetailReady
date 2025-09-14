@@ -49,10 +49,10 @@ function createUploadRouter(db) {
       }
 
       uploadedFilePath = req.file.path;
-      console.log('📄 Processing uploaded file:', req.file.originalname);
+      console.log('Processing uploaded file:', req.file.originalname);
 
       // Extract text from PDF
-      console.log('📖 Extracting text from PDF...');
+      console.log('Extracting text from PDF...');
       const pdfBuffer = fs.readFileSync(uploadedFilePath);
       const pdfData = await pdfParse(pdfBuffer);
       
@@ -60,19 +60,19 @@ function createUploadRouter(db) {
         throw new Error('No text content found in PDF');
       }
 
-      console.log(`📝 Extracted ${pdfData.text.length} characters from PDF`);
+      console.log(`Extracted ${pdfData.text.length} characters from PDF`);
 
       // Parse with AI
-      console.log('🤖 Parsing compliance data with AI...');
+      console.log('Parsing compliance data with AI...');
       const requirements = await parseComplianceData(pdfData.text);
       
       // Validate parsed requirements
       validateRequirements(requirements);
 
-      console.log(`✅ Successfully parsed ${requirements.length} requirements`);
+      console.log(`Successfully parsed ${requirements.length} requirements`);
 
       // Store in database
-      console.log('💾 Storing requirements in database...');
+      console.log('Storing requirements in database...');
       const insertedIds = await dbService.insertViolationsBatch(
         requirements.map(req => ({
           ...req,
@@ -80,7 +80,7 @@ function createUploadRouter(db) {
         }))
       );
 
-      console.log(`💾 Stored ${insertedIds.length} requirements in database`);
+      console.log(`Stored ${insertedIds.length} requirements in database`);
 
       // Clean up uploaded file
       await cleanupUploadedFile(uploadedFilePath);
@@ -95,14 +95,14 @@ function createUploadRouter(db) {
       });
 
     } catch (error) {
-      console.error('❌ Upload processing error:', error);
+      console.error('Upload processing error:', error);
 
       // Clean up uploaded file if it exists
       if (uploadedFilePath) {
         try {
           await cleanupUploadedFile(uploadedFilePath);
         } catch (cleanupError) {
-          console.error('❌ Error cleaning up uploaded file:', cleanupError);
+          console.error('Error cleaning up uploaded file:', cleanupError);
         }
       }
 
@@ -159,7 +159,7 @@ function createUploadRouter(db) {
       }
 
       uploadedFilePath = req.file.path;
-      console.log('🔍 Validating uploaded file:', req.file.originalname);
+      console.log('Validating uploaded file:', req.file.originalname);
 
       // Extract text from PDF
       const pdfBuffer = fs.readFileSync(uploadedFilePath);
@@ -184,14 +184,14 @@ function createUploadRouter(db) {
       });
 
     } catch (error) {
-      console.error('❌ File validation error:', error);
+      console.error('File validation error:', error);
 
       // Clean up uploaded file if it exists
       if (uploadedFilePath) {
         try {
           await cleanupUploadedFile(uploadedFilePath);
         } catch (cleanupError) {
-          console.error('❌ Error cleaning up uploaded file:', cleanupError);
+          console.error('Error cleaning up uploaded file:', cleanupError);
         }
       }
 

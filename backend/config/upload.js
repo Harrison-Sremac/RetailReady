@@ -125,10 +125,10 @@ function cleanupUploadedFile(filePath) {
     const fs = require('fs');
     fs.unlink(filePath, (err) => {
       if (err) {
-        console.error('❌ Error deleting uploaded file:', err);
+        console.error('Error deleting uploaded file:', err);
         reject(err);
       } else {
-        console.log('✅ Uploaded file cleaned up:', filePath);
+        console.log('Uploaded file cleaned up:', filePath);
         resolve();
       }
     });

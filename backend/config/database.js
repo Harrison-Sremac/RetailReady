@@ -98,7 +98,7 @@ const dbConfig = {
 function initializeDatabase() {
   const db = new sqlite3.Database(dbConfig.dbPath, dbConfig.connectionOptions);
   
-  console.log('📊 Database connection initialized');
+  console.log('Database connection initialized');
   return db;
 }
 
@@ -115,10 +115,10 @@ function createTables(db) {
       // Create violations table
       db.run(dbConfig.schemas.violations, (err) => {
         if (err) {
-          console.error('❌ Error creating violations table:', err);
+          console.error('Error creating violations table:', err);
           reject(err);
         } else {
-          console.log('✅ Violations table created/verified');
+          console.log('Violations table created/verified');
           resolve();
         }
       });
@@ -137,13 +137,13 @@ function seedDatabase(db) {
   return new Promise((resolve, reject) => {
     db.get("SELECT COUNT(*) as count FROM violations", (err, row) => {
       if (err) {
-        console.error('❌ Error checking database:', err);
+        console.error('Error checking database:', err);
         reject(err);
         return;
       }
       
       if (row.count === 0) {
-        console.log('🌱 Seeding database with Dick\'s Sporting Goods compliance data...');
+        console.log('Seeding database with Dick\'s Sporting Goods compliance data...');
         
         const stmt = db.prepare(`
           INSERT INTO violations (requirement, violation, fine, category, severity, retailer) 
@@ -162,9 +162,9 @@ function seedDatabase(db) {
         });
         
         stmt.finalize();
-        console.log('✅ Database seeded successfully!');
+        console.log('Database seeded successfully!');
       } else {
-        console.log('📋 Database already contains data, skipping seed');
+        console.log('Database already contains data, skipping seed');
       }
       
       resolve();
@@ -185,7 +185,7 @@ async function initializeCompleteDatabase() {
     await seedDatabase(db);
     return db;
   } catch (error) {
-    console.error('❌ Database initialization failed:', error);
+    console.error('Database initialization failed:', error);
     throw error;
   }
 }
@@ -201,9 +201,9 @@ function closeDatabase(db) {
   return new Promise((resolve) => {
     db.close((err) => {
       if (err) {
-        console.error('❌ Error closing database:', err);
+        console.error('Error closing database:', err);
       } else {
-        console.log('✅ Database connection closed');
+        console.log('Database connection closed');
       }
       resolve();
     });

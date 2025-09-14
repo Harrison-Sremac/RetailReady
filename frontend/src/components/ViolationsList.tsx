@@ -124,9 +124,9 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
             ID: #{violation.id}
           </div>
           <div className="text-sm text-gray-500">
-            Risk Level: {violation.severity === 'High' ? '🔴 High Risk' : 
-                       violation.severity === 'Medium' ? '🟡 Medium Risk' : 
-                       '🟢 Low Risk'}
+            Risk Level: {violation.severity === 'High' ? 'High Risk' : 
+                       violation.severity === 'Medium' ? 'Medium Risk' : 
+                       'Low Risk'}
           </div>
         </div>
       </div>

@@ -6,25 +6,25 @@ RetailReady is a comprehensive compliance management system that helps retailers
 
 ## Features
 
-### 🤖 AI-Powered Document Parsing
+### AI-Powered Document Parsing
 - Upload PDF compliance documents
 - Automatic extraction of requirements, violations, and fine structures
 - Intelligent categorization and severity assessment
 - Support for multiple retailers and compliance standards
 
-### 📊 Risk Assessment Calculator
+### Risk Assessment Calculator
 - Interactive risk calculation based on violation quantities
 - Real-time fine estimation
 - Risk level determination (High, Medium, Low)
 - Comprehensive risk factor analysis
 
-### 🔍 Advanced Filtering & Search
+### Advanced Filtering & Search
 - Filter by category, severity, and retailer
 - Real-time search and filtering
 - Organized database views
 - Detailed violation information
 
-### 📈 Data Management
+### Data Management
 - SQLite database for reliable data storage
 - Organized data views by retailer and category
 - Comprehensive violation tracking

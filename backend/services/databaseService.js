@@ -58,7 +58,7 @@ class DatabaseService {
 
       this.db.all(query, params, (err, rows) => {
         if (err) {
-          console.error('❌ Database error in getViolations:', err);
+          console.error('Database error in getViolations:', err);
           reject(new Error('Database query failed'));
         } else {
           resolve(rows);
@@ -77,7 +77,7 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       this.db.get("SELECT * FROM violations WHERE id = ?", [id], (err, row) => {
         if (err) {
-          console.error('❌ Database error in getViolationById:', err);
+          console.error('Database error in getViolationById:', err);
           reject(new Error('Database query failed'));
         } else {
           resolve(row || null);
@@ -95,7 +95,7 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       this.db.all("SELECT DISTINCT category FROM violations ORDER BY category", (err, rows) => {
         if (err) {
-          console.error('❌ Database error in getCategories:', err);
+          console.error('Database error in getCategories:', err);
           reject(new Error('Database query failed'));
         } else {
           resolve(rows.map(row => row.category));
@@ -113,7 +113,7 @@ class DatabaseService {
     return new Promise((resolve, reject) => {
       this.db.all("SELECT DISTINCT retailer FROM violations ORDER BY retailer", (err, rows) => {
         if (err) {
-          console.error('❌ Database error in getRetailers:', err);
+          console.error('Database error in getRetailers:', err);
           reject(new Error('Database query failed'));
         } else {
           resolve(rows.map(row => row.retailer));
@@ -152,7 +152,7 @@ class DatabaseService {
         stmt.finalize();
         
         if (err) {
-          console.error('❌ Database error in insertViolation:', err);
+          console.error('Database error in insertViolation:', err);
           reject(new Error('Failed to insert violation'));
         } else {
           resolve(this.lastID);
@@ -186,7 +186,7 @@ class DatabaseService {
           violation.retailer
         ], function(err) {
           if (err) {
-            console.error('❌ Database error in insertViolationsBatch:', err);
+            console.error('Database error in insertViolationsBatch:', err);
             stmt.finalize();
             reject(new Error('Failed to insert violations batch'));
             return;
@@ -224,7 +224,7 @@ class DatabaseService {
 
       this.db.all(query, [], async (err, rows) => {
         if (err) {
-          console.error('❌ Database error in getDatabaseView:', err);
+          console.error('Database error in getDatabaseView:', err);
           reject(new Error('Database query failed'));
           return;
         }
@@ -312,7 +312,7 @@ class DatabaseService {
 
       this.db.all(query, [retailer, category], (err, rows) => {
         if (err) {
-          console.error('❌ Database error in getViolationsByRetailerAndCategory:', err);
+          console.error('Database error in getViolationsByRetailerAndCategory:', err);
           reject(new Error('Database query failed'));
         } else {
           resolve(rows);
@@ -348,7 +348,7 @@ class DatabaseService {
       Object.entries(queries).forEach(([key, query]) => {
         this.db.all(query, [], (err, rows) => {
           if (err) {
-            console.error(`❌ Database error in getDatabaseStats (${key}):`, err);
+            console.error(`Database error in getDatabaseStats (${key}):`, err);
             reject(new Error('Database query failed'));
             return;
           }
