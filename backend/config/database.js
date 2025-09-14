@@ -40,6 +40,8 @@ const dbConfig = {
         fine_amount REAL,
         fine_unit TEXT,
         additional_fees TEXT,
+        prevention_method TEXT DEFAULT 'Manual verification',
+        responsible_party TEXT DEFAULT 'Warehouse Worker',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `,
@@ -210,7 +212,9 @@ function runMigrations(db) {
     const migrations = [
       "ALTER TABLE violations ADD COLUMN fine_amount REAL",
       "ALTER TABLE violations ADD COLUMN fine_unit TEXT", 
-      "ALTER TABLE violations ADD COLUMN additional_fees TEXT"
+      "ALTER TABLE violations ADD COLUMN additional_fees TEXT",
+      "ALTER TABLE violations ADD COLUMN prevention_method TEXT DEFAULT 'Manual verification'",
+      "ALTER TABLE violations ADD COLUMN responsible_party TEXT DEFAULT 'Warehouse Worker'"
     ];
     
     let completed = 0;

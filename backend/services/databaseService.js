@@ -170,8 +170,8 @@ class DatabaseService {
   async insertViolationsBatch(violations) {
     return new Promise((resolve, reject) => {
       const stmt = this.db.prepare(`
-        INSERT INTO violations (requirement, violation, fine, category, severity, retailer, fine_amount, fine_unit, additional_fees) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO violations (requirement, violation, fine, category, severity, retailer, fine_amount, fine_unit, additional_fees, prevention_method, responsible_party) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
       
       const insertedIds = [];
@@ -193,7 +193,9 @@ class DatabaseService {
           violation.retailer,
           violation.fine_amount,
           violation.fine_unit,
-          violation.additional_fees
+          violation.additional_fees,
+          violation.prevention_method,
+          violation.responsible_party
         ], function(err) {
           if (err) {
             console.error('Database error in insertViolationsBatch:', err);

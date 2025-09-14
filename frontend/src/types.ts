@@ -24,12 +24,22 @@ export interface Violation {
   violation: string
   /** Fine structure and amount */
   fine: string
-  /** Category classification (e.g., Labeling, ASN, Packaging) */
+  /** Workflow-based category (Pre-Packing, During Packing, Post-Packing, Pre-Shipment, EDI/Digital, Carrier/Routing) */
   category: string
   /** Severity level of the violation */
   severity: 'High' | 'Medium' | 'Low'
   /** Retailer or source of the requirement */
   retailer: string
+  /** Numeric fine amount if available */
+  fine_amount?: number
+  /** Unit of measurement for the fine */
+  fine_unit?: string
+  /** Additional fees or penalties */
+  additional_fees?: string
+  /** Method to prevent this violation */
+  prevention_method?: string
+  /** Who is responsible for prevention */
+  responsible_party?: string
   /** Timestamp when the violation was created */
   created_at: string
 }

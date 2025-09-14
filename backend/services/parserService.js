@@ -36,13 +36,22 @@ const parserConfig = {
   maxTextLength: 4000,
   
   // System prompt for the AI assistant
-  systemPrompt: "You are an expert at parsing retailer compliance documents and extracting structured data about requirements, violations, and fines. You excel at finding specific fine amounts, pricing structures, and detailed violation descriptions.",
+  systemPrompt: "You are an expert at parsing retailer compliance documents and extracting structured data about requirements, violations, and fines. You excel at categorizing violations by workflow stage and prevention method.",
   
   // User prompt template
   userPromptTemplate: `
     Parse the following retailer compliance guide text and extract compliance requirements, violations, and fine structures. 
     
-    IMPORTANT: Look for specific fine amounts, pricing structures, and detailed violation descriptions. Extract exact dollar amounts, per-unit costs, and penalty structures.
+    IMPORTANT: Categorize violations by WHEN they occur in the workflow and WHO is responsible for prevention.
+    
+    Use these workflow-based categories:
+    
+    "Pre-Packing": Requirements checked before packing starts (order verification, box selection, product prep)
+    "During Packing": Requirements during the packing process (SKU verification, product presentation, padding)
+    "Post-Packing": Requirements after packing but before shipping (labeling, sealing, documentation)
+    "Pre-Shipment": Requirements before shipment leaves (ASN, carrier selection, final validation)
+    "EDI/Digital": Electronic data interchange and system requirements (ASN timing, routing requests, invoices)
+    "Carrier/Routing": Transportation and logistics requirements (carrier selection, routing, shipment methods)
     
     Return the data in JSON format with this structure:
     
@@ -52,11 +61,13 @@ const parserConfig = {
           "requirement": "specific requirement text (e.g., 'UCC-128 labels must be 2 inches from bottom/right edge')",
           "violation": "what constitutes a violation (e.g., 'Labels not positioned correctly')",
           "fine": "exact fine amount and structure (e.g., '$2/carton + $250' or '$50 per violation')",
-          "category": "category like Labeling, ASN, Packaging, Delivery, Product Data, etc.",
+          "category": "workflow category (Pre-Packing, During Packing, Post-Packing, Pre-Shipment, EDI/Digital, Carrier/Routing)",
           "severity": "High, Medium, or Low",
           "fine_amount": "numeric value if available (e.g., 2, 250, 50)",
           "fine_unit": "unit of measurement (e.g., 'per carton', 'per violation', 'per item')",
-          "additional_fees": "any additional fees or penalties (e.g., '$250 flat fee')"
+          "additional_fees": "any additional fees or penalties (e.g., '$250 flat fee')",
+          "prevention_method": "how to prevent this violation (e.g., 'Visual guides', 'System validation', 'Order-specific instructions')",
+          "responsible_party": "who is responsible (e.g., 'Warehouse Worker', 'IT System', 'Supervisor')"
         }
       ]
     }
@@ -67,6 +78,8 @@ const parserConfig = {
     3. Flat fees or penalties
     4. Detailed violation descriptions
     5. Exact requirement specifications
+    6. WHEN in the workflow this occurs
+    7. WHO is responsible for prevention
     
     Text to parse:
     {text}
@@ -147,6 +160,8 @@ async function parseComplianceData(pdfText) {
       req.fine_amount = req.fine_amount || null;
       req.fine_unit = req.fine_unit || null;
       req.additional_fees = req.additional_fees || null;
+      req.prevention_method = req.prevention_method || 'Manual verification';
+      req.responsible_party = req.responsible_party || 'Warehouse Worker';
       
       return req;
     });
