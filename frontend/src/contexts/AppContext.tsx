@@ -51,7 +51,13 @@ export function AppProvider({ children }: AppProviderProps) {
       setLoading(true);
       setError(null);
       
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await violationsApi.getAll({});
+      clearTimeout(timeoutId);
+      
       if (response.success) {
         setApiConnected(true);
         setViolations(response.data || []);

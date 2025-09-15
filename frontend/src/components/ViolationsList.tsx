@@ -47,7 +47,7 @@ interface ViolationCardProps {
  * @param showDetails - Whether to show detailed information
  * @returns JSX element
  */
-const ViolationCard: React.FC<ViolationCardProps> = ({
+const ViolationCard: React.FC<ViolationCardProps> = React.memo(({
   violation,
   onViolationClick,
   showDetails = true
@@ -132,7 +132,7 @@ const ViolationCard: React.FC<ViolationCardProps> = ({
       </div>
     </div>
   );
-};
+});
 
 /**
  * Empty State Component
@@ -191,7 +191,7 @@ const ErrorState: React.FC<{ error: string }> = ({ error }) => (
  *   onViolationClick={(violation) => console.log(violation)}
  * />
  */
-export const ViolationsList: React.FC<ViolationsListProps> = ({
+export const ViolationsList: React.FC<ViolationsListProps> = React.memo(({
   violations,
   loading = false,
   error = null,
@@ -231,4 +231,4 @@ export const ViolationsList: React.FC<ViolationsListProps> = ({
       ))}
     </div>
   );
-};
+});
