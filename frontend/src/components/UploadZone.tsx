@@ -29,6 +29,7 @@ interface UploadZoneProps {
 export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
   const [isDragOver, setIsDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [processingStage, setProcessingStage] = useState<string>('')
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -92,11 +93,33 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
 
     setUploading(true)
     setMessage(null)
+    setProcessingStage('Uploading file...')
 
     const formData = new FormData()
     formData.append('pdf', file)
 
     try {
+      // Simulate processing stages with timeouts
+      const stages = [
+        { delay: 500, stage: 'Uploading file...' },
+        { delay: 1000, stage: 'Extracting text from PDF...' },
+        { delay: 1500, stage: 'Analyzing compliance requirements...' },
+        { delay: 2000, stage: 'Parsing with AI...' },
+        { delay: 1000, stage: 'Finalizing results...' }
+      ]
+
+      let currentStage = 0
+      const updateStage = () => {
+        if (currentStage < stages.length) {
+          setProcessingStage(stages[currentStage].stage)
+          currentStage++
+          if (currentStage < stages.length) {
+            setTimeout(updateStage, stages[currentStage].delay)
+          }
+        }
+      }
+      updateStage()
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
@@ -105,18 +128,22 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
       const data = await response.json()
 
       if (response.ok) {
+        setProcessingStage('Complete!')
         setMessage({ 
           type: 'success', 
           text: `Successfully parsed ${data.requirements?.length || 0} requirements from ${file.name}` 
         })
         onUploadSuccess()
       } else {
+        setProcessingStage('Error occurred')
         setMessage({ type: 'error', text: data.error || 'Upload failed' })
       }
     } catch (error) {
+      setProcessingStage('Error occurred')
       setMessage({ type: 'error', text: 'Network error. Please try again.' })
     } finally {
       setUploading(false)
+      setTimeout(() => setProcessingStage(''), 2000) // Clear stage after 2 seconds
     }
   }
 
@@ -150,18 +177,37 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
         
         <div className="flex flex-col items-center space-y-3">
           {uploading ? (
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="relative">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-6 h-6 bg-blue-600 rounded-full animate-pulse"></div>
+              </div>
+            </div>
           ) : (
             <Upload className="w-12 h-12 text-gray-400" />
           )}
           
-          <div>
+          <div className="text-center">
             <p className="text-lg font-medium text-gray-900">
               {uploading ? 'Processing PDF...' : 'Upload Compliance Guide'}
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              Drag and drop a PDF file here, or click to browse
+              {uploading ? processingStage : 'Drag and drop a PDF file here, or click to browse'}
             </p>
+            {uploading && (
+              <div className="mt-3 space-y-2">
+                <div className="flex justify-center">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                  </div>
+                </div>
+                <div className="text-xs text-blue-600 font-medium">
+                  This may take 30-60 seconds for complex documents
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="flex items-center space-x-2 text-xs text-gray-400">
@@ -172,17 +218,24 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
       </div>
 
       {message && (
-        <div className={`flex items-center space-x-2 p-3 rounded-md ${
+        <div className={`flex items-center space-x-2 p-4 rounded-md ${
           message.type === 'success' 
             ? 'bg-green-50 text-green-700 border border-green-200' 
             : 'bg-red-50 text-red-700 border border-red-200'
         }`}>
           {message.type === 'success' ? (
-            <CheckCircle className="w-5 h-5" />
+            <CheckCircle className="w-5 h-5 flex-shrink-0" />
           ) : (
-            <AlertCircle className="w-5 h-5" />
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
           )}
-          <span className="text-sm font-medium">{message.text}</span>
+          <div className="flex-1">
+            <span className="text-sm font-medium block">{message.text}</span>
+            {message.type === 'success' && (
+              <span className="text-xs text-green-600 mt-1 block">
+                ✅ Compliance data loaded • Risk calculator ready • Routing guide analysis available
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>
