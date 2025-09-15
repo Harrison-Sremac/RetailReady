@@ -175,38 +175,36 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
           className="hidden"
         />
         
-        <div className="flex flex-col items-center space-y-3">
+        <div className="flex flex-col items-center space-y-4">
           {uploading ? (
-            <div className="relative">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-6 h-6 bg-blue-600 rounded-full animate-pulse"></div>
+            <div className="flex flex-col items-center space-y-4">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-blue-600"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+              <div className="flex space-x-1">
+                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
               </div>
             </div>
           ) : (
             <Upload className="w-12 h-12 text-gray-400" />
           )}
           
-          <div className="text-center">
+          <div className="text-center space-y-2">
             <p className="text-lg font-medium text-gray-900">
               {uploading ? 'Processing PDF...' : 'Upload Compliance Guide'}
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500">
               {uploading ? processingStage : 'Drag and drop a PDF file here, or click to browse'}
             </p>
             {uploading && (
-              <div className="mt-3 space-y-2">
-                <div className="flex justify-center">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
-                  </div>
-                </div>
-                <div className="text-xs text-blue-600 font-medium">
-                  This may take 30-60 seconds for complex documents
-                </div>
-              </div>
+              <p className="text-xs text-blue-600 font-medium">
+                This may take 30-60 seconds for complex documents
+              </p>
             )}
           </div>
           

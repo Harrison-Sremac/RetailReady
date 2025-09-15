@@ -44,8 +44,8 @@ const TabNavigation: React.FC<{
   ];
 
   return (
-    <div className="border-b border-gray-200">
-      <nav className="-mb-px flex space-x-8 overflow-x-auto">
+    <div className="border-b border-gray-200 bg-gray-50">
+      <nav className="-mb-px flex space-x-2 overflow-x-auto px-4">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -76,18 +76,18 @@ const TabNavigation: React.FC<{
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+              className={`flex items-center space-x-2 py-4 px-4 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                 isActive
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600 bg-white'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-100'
               } ${!hasData ? 'opacity-50 cursor-not-allowed' : ''}`}
               disabled={!hasData}
             >
-              <Icon className="w-4 h-4" />
-              <span>{tab.label}</span>
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              <span className="flex-shrink-0">{tab.label}</span>
               {hasData && (
-                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                  isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'
+                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs flex-shrink-0 ${
+                  isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-600'
                 }`}>
                   {tab.id === 'order-types' ? data?.order_types.length :
                    tab.id === 'carton-specs' ? '1' :
@@ -114,19 +114,19 @@ const OverviewTab: React.FC<{ data: ParsedRoutingGuideData }> = ({ data }) => {
   const totalFineExposure = data.requirements.reduce((sum, v) => sum + (v.fine_amount || 0), 0);
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+    <div className="space-y-8">
+      <div className="text-center space-y-3">
+        <h2 className="text-3xl font-bold text-gray-900">
           Routing Guide Overview
         </h2>
-        <p className="text-gray-600">
+        <p className="text-lg text-gray-600">
           Comprehensive analysis of compliance requirements and risk factors
         </p>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-blue-50 p-6 rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="bg-blue-50 p-8 rounded-lg">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-blue-600" />
@@ -138,7 +138,7 @@ const OverviewTab: React.FC<{ data: ParsedRoutingGuideData }> = ({ data }) => {
           </div>
         </div>
 
-        <div className="bg-red-50 p-6 rounded-lg">
+        <div className="bg-red-50 p-8 rounded-lg">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-red-600" />
@@ -150,7 +150,7 @@ const OverviewTab: React.FC<{ data: ParsedRoutingGuideData }> = ({ data }) => {
           </div>
         </div>
 
-        <div className="bg-yellow-50 p-6 rounded-lg">
+        <div className="bg-yellow-50 p-8 rounded-lg">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
               <Package className="w-5 h-5 text-yellow-600" />
@@ -162,7 +162,7 @@ const OverviewTab: React.FC<{ data: ParsedRoutingGuideData }> = ({ data }) => {
           </div>
         </div>
 
-        <div className="bg-green-50 p-6 rounded-lg">
+        <div className="bg-green-50 p-8 rounded-lg">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <Clock className="w-5 h-5 text-green-600" />
@@ -176,8 +176,8 @@ const OverviewTab: React.FC<{ data: ParsedRoutingGuideData }> = ({ data }) => {
       </div>
 
       {/* Quick Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white border border-gray-200 rounded-lg p-8">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Risk Areas</h3>
           <div className="space-y-3">
             {data.requirements
@@ -204,8 +204,8 @@ const OverviewTab: React.FC<{ data: ParsedRoutingGuideData }> = ({ data }) => {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Order Types</h3>
+        <div className="bg-white border border-gray-200 rounded-lg p-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Available Order Types</h3>
           <div className="space-y-2">
             {data.order_types.slice(0, 5).map((orderType, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -421,7 +421,7 @@ export const RoutingGuideViewer: React.FC<RoutingGuideViewerProps> = ({
         data={parsedData}
       />
       
-      <div className="p-6">
+      <div className="p-8">
         {renderTabContent()}
       </div>
     </div>
