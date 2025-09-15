@@ -295,6 +295,38 @@ function createViolationsRouter(db) {
     }
   });
 
+  /**
+   * DELETE /api/violations/clear-all
+   * 
+   * Clear ALL compliance data (including sample data)
+   * 
+   * @route DELETE /api/violations/clear-all
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Promise<void>}
+   */
+  router.delete('/clear-all', async (req, res) => {
+    try {
+      console.log('Clearing ALL compliance data...');
+      
+      const deletedCount = await dbService.clearAllData();
+      
+      console.log(`Cleared ${deletedCount} total violations`);
+      
+      res.json({
+        success: true,
+        message: `Successfully cleared ${deletedCount} compliance requirements`,
+        deleted_count: deletedCount
+      });
+    } catch (error) {
+      console.error('Error clearing all data:', error);
+      res.status(500).json({ 
+        error: 'Failed to clear all data',
+        message: error.message 
+      });
+    }
+  });
+
   return router;
 }
 

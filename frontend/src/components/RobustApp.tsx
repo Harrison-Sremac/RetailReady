@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Violation, Filters } from '../types';
+import { useState, useEffect, useMemo } from 'react';
+import { Violation, Filters, ParsedRoutingGuideData } from '../types';
 import { violationsApi } from '../utils/api';
 import Advertisement from './Advertisement';
 import AdvertisementBanner from './AdvertisementBanner';
 import SidebarAd from './SidebarAd';
 import AdToggle from './AdToggle';
+import { RoutingGuideViewer } from './RoutingGuideViewer';
 
 /**
  * Robust App Component with Error Boundaries
@@ -27,6 +28,7 @@ function RobustApp() {
     results: any;
   } | null>(null);
   const [showAds, setShowAds] = useState(false);
+  const [parsedRoutingGuideData, setParsedRoutingGuideData] = useState<ParsedRoutingGuideData | null>(null);
 
   // Test API connection on mount
   useEffect(() => {
@@ -158,7 +160,14 @@ function RobustApp() {
       });
 
       if (response.ok) {
+        const responseData = await response.json();
         alert('File uploaded successfully! The system will process it shortly.');
+        
+        // Set parsed routing guide data if available
+        if (responseData.data) {
+          setParsedRoutingGuideData(responseData.data);
+        }
+        
         // Refresh violations data
         const violationsResponse = await violationsApi.getAll({});
         if (violationsResponse.success && violationsResponse.data) {
@@ -486,12 +495,55 @@ function RobustApp() {
           />
         )}
 
-        {/* Step 3: Risk Assessment Calculator */}
+        {/* Step 3: Routing Guide Analysis */}
+        {(parsedRoutingGuideData || (violations.length > 0 && violations.some(v => v.retailer === 'Uploaded Document'))) && (
+          <section className="mb-8">
+            <div className="flex items-center mb-6">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <span className="text-blue-600 font-semibold text-sm">3</span>
+              </div>
+              <h2 className="text-xl font-semibold">Routing Guide Analysis</h2>
+            </div>
+            
+            {parsedRoutingGuideData ? (
+              <RoutingGuideViewer parsedData={parsedRoutingGuideData} />
+            ) : (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="flex items-center mb-4">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-blue-600 font-semibold">📊</span>
+                  </div>
+                  <h3 className="text-lg font-medium text-blue-900">Routing Guide Data Available</h3>
+                </div>
+                <p className="text-blue-700 mb-4">
+                  Upload a routing guide PDF to see detailed analysis including order types, carton specifications, 
+                  label placement rules, and product requirements.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white rounded-lg p-4 border border-blue-200">
+                    <h4 className="font-medium text-blue-900 mb-2">Order Types</h4>
+                    <p className="text-sm text-blue-700">Bulk Orders, Pack by Store, Direct to Store</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 border border-blue-200">
+                    <h4 className="font-medium text-blue-900 mb-2">Carton Specs</h4>
+                    <p className="text-sm text-blue-700">Conveyable dimensions and weight limits</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 border border-blue-200">
+                    <h4 className="font-medium text-blue-900 mb-2">Label Placement</h4>
+                    <p className="text-sm text-blue-700">2 inches from bottom/right edge</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Step 4: Risk Assessment Calculator */}
         <section className="mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center mb-6">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                <span className="text-blue-600 font-semibold text-sm">3</span>
+                <span className="text-blue-600 font-semibold text-sm">{parsedRoutingGuideData ? '4' : '3'}</span>
               </div>
               <h2 className="text-xl font-semibold">Risk Assessment Calculator</h2>
             </div>
@@ -625,12 +677,12 @@ function RobustApp() {
           </div>
         </section>
 
-        {/* Step 4: Top Risk Areas */}
+        {/* Step 5: Top Risk Areas */}
         <section className="mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center mb-6">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                <span className="text-blue-600 font-semibold text-sm">4</span>
+                <span className="text-blue-600 font-semibold text-sm">{parsedRoutingGuideData ? '5' : '4'}</span>
               </div>
               <h2 className="text-xl font-semibold">Top Risk Areas</h2>
             </div>
@@ -669,12 +721,12 @@ function RobustApp() {
           </div>
         </section>
 
-        {/* Step 5: Review Requirements */}
+        {/* Step 6: Review Requirements */}
         <section>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center mb-6">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                <span className="text-blue-600 font-semibold text-sm">5</span>
+                <span className="text-blue-600 font-semibold text-sm">{parsedRoutingGuideData ? '6' : '5'}</span>
               </div>
               <h2 className="text-xl font-semibold">Review Requirements</h2>
             </div>

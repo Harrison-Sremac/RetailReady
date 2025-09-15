@@ -64,14 +64,16 @@ function createUploadRouter(db) {
 
       // Parse with AI
       console.log('Parsing compliance data with AI...');
-      const requirements = await parseComplianceData(pdfData.text);
+      const structuredData = await parseComplianceData(pdfData.text);
       
-      // Validate parsed requirements
-      validateRequirements(requirements);
+      // Validate parsed data (handle both old array format and new structured format)
+      validateRequirements(structuredData);
 
+      // Extract requirements for database storage
+      const requirements = Array.isArray(structuredData) ? structuredData : structuredData.requirements;
       console.log(`Successfully parsed ${requirements.length} requirements`);
 
-      // Store in database
+      // Store requirements in database
       console.log('Storing requirements in database...');
       const insertedIds = await dbService.insertViolationsBatch(
         requirements.map(req => ({
@@ -86,10 +88,17 @@ function createUploadRouter(db) {
       await cleanupUploadedFile(uploadedFilePath);
       uploadedFilePath = null; // Mark as cleaned up
 
-      // Return success response
+      // Return success response with full structured data
+      console.log('Returning response with structured data:', {
+        hasData: !!structuredData,
+        dataKeys: structuredData ? Object.keys(structuredData) : 'none',
+        requirementsCount: requirements.length
+      });
+      
       res.json({ 
         success: true, 
-        requirements: requirements,
+        data: structuredData, // Return full structured data
+        requirements: requirements, // Backward compatibility
         inserted_count: insertedIds.length,
         message: `Successfully parsed ${requirements.length} requirements from ${req.file.originalname}`
       });

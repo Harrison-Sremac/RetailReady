@@ -27,59 +27,116 @@ const openai = new OpenAI({
  */
 const parserConfig = {
   // OpenAI model to use for parsing
-  model: "gpt-3.5-turbo",
+  model: "gpt-4o-mini",
   
   // Temperature setting for consistent results
   temperature: 0.1,
   
   // Maximum text length to process (to avoid token limits)
-  maxTextLength: 4000,
+  maxTextLength: 50000,
   
   // System prompt for the AI assistant
-  systemPrompt: "You are an expert at parsing retailer compliance documents and extracting structured data about requirements, violations, and fines. You excel at categorizing violations by workflow stage and prevention method.",
+  systemPrompt: "You are an expert at parsing retailer routing guides and compliance documents. You excel at extracting structured data about requirements, violations, fines, and operational guidelines. You can identify packing methods, violation matrices, specifications, timing requirements, and product-specific rules.",
   
   // User prompt template
   userPromptTemplate: `
-    Parse the following retailer compliance guide text and extract compliance requirements, violations, and fine structures. 
+    Parse the following Dick's Sporting Goods routing guide text and extract REAL compliance requirements with ACTUAL fine amounts from the document.
     
-    IMPORTANT: Categorize violations by WHEN they occur in the workflow and WHO is responsible for prevention.
+    CRITICAL: Look for these SPECIFIC violation codes and fine amounts that are mentioned in the document:
     
-    Use these workflow-based categories:
+    VIOLATION CODES TO FIND:
+    - NL: UCC128 label not on carton ($7.50 per carton + $250 service fee)
+    - EA: ASN violations ($250-$500 per shipment)
+    - RP: Retail price missing/inaccurate ($0.50 per unit + $250 service fee)
+    - MC: Multiple UPCs mixed in one carton ($50 per occurrence)
+    - CO: PO received after cancel date ($50)
+    - And other violation codes mentioned in the document
     
-    "Pre-Packing": Requirements checked before packing starts (order verification, box selection, product prep)
-    "During Packing": Requirements during the packing process (SKU verification, product presentation, padding)
-    "Post-Packing": Requirements after packing but before shipping (labeling, sealing, documentation)
-    "Pre-Shipment": Requirements before shipment leaves (ASN, carrier selection, final validation)
-    "EDI/Digital": Electronic data interchange and system requirements (ASN timing, routing requests, invoices)
-    "Carrier/Routing": Transportation and logistics requirements (carrier selection, routing, shipment methods)
+    Extract data in these specific categories:
     
-    Return the data in JSON format with this structure:
+    1. ORDER TYPE REQUIREMENTS - Different packing methods and their rules
+    2. VIOLATION MATRIX - All violation codes with ACTUAL fine amounts and triggers
+    3. CARTON SPECIFICATIONS - Size, weight, and dimensional requirements
+    4. LABEL PLACEMENT RULES - Exact positioning requirements and special cases
+    5. TIMING REQUIREMENTS - Critical deadlines for ASN, routing requests, etc.
+    6. PRODUCT-SPECIFIC REQUIREMENTS - Category-specific rules (apparel, footwear, etc.)
+    
+    Return the data in JSON format with this comprehensive structure:
     
     {
       "requirements": [
         {
-          "requirement": "specific requirement text (e.g., 'UCC-128 labels must be 2 inches from bottom/right edge')",
-          "violation": "what constitutes a violation (e.g., 'Labels not positioned correctly')",
-          "fine": "exact fine amount and structure (e.g., '$2/carton + $250' or '$50 per violation')",
+          "requirement": "specific requirement text from the document",
+          "violation": "what constitutes a violation",
+          "fine": "exact fine amount and structure from the document",
           "category": "workflow category (Pre-Packing, During Packing, Post-Packing, Pre-Shipment, EDI/Digital, Carrier/Routing)",
           "severity": "High, Medium, or Low",
-          "fine_amount": "numeric value if available (e.g., 2, 250, 50)",
-          "fine_unit": "unit of measurement (e.g., 'per carton', 'per violation', 'per item')",
-          "additional_fees": "any additional fees or penalties (e.g., '$250 flat fee')",
-          "prevention_method": "how to prevent this violation (e.g., 'Visual guides', 'System validation', 'Order-specific instructions')",
-          "responsible_party": "who is responsible (e.g., 'Warehouse Worker', 'IT System', 'Supervisor')"
+          "fine_amount": "numeric value if available",
+          "fine_unit": "unit of measurement (per carton, per item, per violation, flat fee)",
+          "additional_fees": "any additional fees or penalties",
+          "prevention_method": "how to prevent this violation",
+          "responsible_party": "who is responsible for prevention"
+        }
+      ],
+      "order_types": [
+        {
+          "type": "order type name (e.g., 'Bulk Orders', 'Pack by Store', 'Direct to Store')",
+          "description": "description of this order type",
+          "rules": ["specific rule 1", "specific rule 2"],
+          "packing_method": "packing method description",
+          "skus_per_carton": "SKU mixing rules",
+          "special_requirements": ["any special requirements"]
+        }
+      ],
+      "carton_specs": {
+        "conveyable": {
+          "length_min": "minimum length in inches",
+          "length_max": "maximum length in inches", 
+          "width_min": "minimum width in inches",
+          "width_max": "maximum width in inches",
+          "height_min": "minimum height in inches",
+          "height_max": "maximum height in inches",
+          "weight_min": "minimum weight in pounds",
+          "weight_max": "maximum weight in pounds"
+        },
+        "non_conveyable": "description of non-conveyable requirements"
+      },
+      "label_placement": [
+        {
+          "requirement": "label placement requirement",
+          "standard_position": "standard positioning (e.g., '2 inches from bottom, 2 inches from right')",
+          "special_cases": ["special case 1", "special case 2"],
+          "violation_fine": "fine for incorrect placement"
+        }
+      ],
+      "timing_requirements": [
+        {
+          "requirement": "timing requirement name (e.g., 'ASN Submission', 'Routing Request')",
+          "deadline": "deadline description (e.g., 'within 1 hour of shipment')",
+          "timeframe": "specific timeframe",
+          "violation_fine": "fine for missing deadline"
+        }
+      ],
+      "product_requirements": [
+        {
+          "category": "product category (e.g., 'Apparel', 'Footwear', 'Electronics')",
+          "requirements": ["requirement 1", "requirement 2"],
+          "special_rules": ["special rule 1", "special rule 2"],
+          "violations": ["violation description 1", "violation description 2"]
         }
       ]
     }
     
-    Focus on finding:
-    1. Specific dollar amounts ($X, $X.XX)
-    2. Per-unit pricing (per carton, per item, per violation)
-    3. Flat fees or penalties
-    4. Detailed violation descriptions
-    5. Exact requirement specifications
-    6. WHEN in the workflow this occurs
-    7. WHO is responsible for prevention
+    EXTRACTION FOCUS:
+    1. Look for "Violation Amount" sections with actual fine amounts
+    2. Find specific requirement text that mentions "must", "shall", "required"
+    3. Extract actual dollar amounts like "$7.50", "$250", "$500", etc.
+    4. Look for violation codes (NL, EA, RP, MC, CO, etc.)
+    5. Find timing requirements (ASN within 1 hour, etc.)
+    6. Extract carton specifications and dimensional requirements
+    7. Find label placement rules and positioning requirements
+    
+    IMPORTANT: Only extract requirements that are ACTUALLY mentioned in the document. Don't make up requirements or fine amounts. Be accurate to what's written in the Dick's Sporting Goods routing guide.
     
     Text to parse:
     {text}
@@ -166,9 +223,20 @@ async function parseComplianceData(pdfText) {
       return req;
     });
     
-    console.log(`Successfully parsed ${validatedRequirements.length} compliance requirements`);
+    // Validate and structure additional data sections
+    const structuredData = {
+      requirements: validatedRequirements,
+      order_types: parsedData.order_types || [],
+      carton_specs: parsedData.carton_specs || {},
+      label_placement: parsedData.label_placement || [],
+      timing_requirements: parsedData.timing_requirements || [],
+      product_requirements: parsedData.product_requirements || []
+    };
     
-    return validatedRequirements;
+    console.log(`Successfully parsed ${validatedRequirements.length} compliance requirements`);
+    console.log(`Additional data: ${structuredData.order_types.length} order types, ${structuredData.label_placement.length} label rules, ${structuredData.timing_requirements.length} timing requirements`);
+    
+    return structuredData;
     
   } catch (error) {
     console.error('Error parsing with OpenAI:', error);
@@ -191,14 +259,17 @@ async function parseComplianceData(pdfText) {
 }
 
 /**
- * Validate parsed compliance requirements
+ * Validate parsed compliance requirements and structured data
  * Ensures all required fields are present and properly formatted
  * 
- * @param {Array} requirements - Array of parsed requirements
+ * @param {Object|Array} data - Parsed data structure or array of requirements
  * @returns {boolean} True if all requirements are valid
  * @throws {Error} Throws error if validation fails
  */
-function validateRequirements(requirements) {
+function validateRequirements(data) {
+  // Handle both old array format and new structured format
+  const requirements = Array.isArray(data) ? data : data.requirements;
+  
   if (!Array.isArray(requirements)) {
     throw new Error('Requirements must be an array');
   }
@@ -221,6 +292,25 @@ function validateRequirements(requirements) {
       throw new Error(`Invalid severity '${req.severity}' at requirement index ${index}`);
     }
   });
+  
+  // If structured data, validate additional sections
+  if (!Array.isArray(data) && data.order_types) {
+    if (!Array.isArray(data.order_types)) {
+      throw new Error('Order types must be an array');
+    }
+    
+    if (!Array.isArray(data.label_placement)) {
+      throw new Error('Label placement must be an array');
+    }
+    
+    if (!Array.isArray(data.timing_requirements)) {
+      throw new Error('Timing requirements must be an array');
+    }
+    
+    if (!Array.isArray(data.product_requirements)) {
+      throw new Error('Product requirements must be an array');
+    }
+  }
   
   return true;
 }

@@ -407,6 +407,30 @@ class DatabaseService {
       );
     });
   }
+
+  /**
+   * Clear ALL compliance data
+   * Removes all violations from the database
+   * 
+   * @returns {Promise<number>} Number of deleted records
+   */
+  async clearAllData() {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        "DELETE FROM violations",
+        function(err) {
+          if (err) {
+            console.error('Database error in clearAllData:', err);
+            reject(new Error('Failed to clear all data'));
+            return;
+          }
+          
+          console.log(`Cleared ${this.changes} total violations`);
+          resolve(this.changes);
+        }
+      );
+    });
+  }
 }
 
 module.exports = DatabaseService;

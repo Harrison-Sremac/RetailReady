@@ -91,3 +91,120 @@ export interface Filters {
   retailer: string
 }
 
+/**
+ * Order Type Interface
+ * 
+ * Represents different order types and their packing requirements.
+ */
+export interface OrderType {
+  /** Order type name */
+  type: string
+  /** Description of this order type */
+  description: string
+  /** Specific rules for this order type */
+  rules: string[]
+  /** Packing method description */
+  packing_method: string
+  /** SKU mixing rules */
+  skus_per_carton: string
+  /** Any special requirements */
+  special_requirements: string[]
+}
+
+/**
+ * Carton Specifications Interface
+ * 
+ * Represents dimensional and weight requirements for cartons.
+ */
+export interface CartonSpecs {
+  /** Conveyable carton specifications */
+  conveyable: {
+    /** Minimum length in inches */
+    length_min: string
+    /** Maximum length in inches */
+    length_max: string
+    /** Minimum width in inches */
+    width_min: string
+    /** Maximum width in inches */
+    width_max: string
+    /** Minimum height in inches */
+    height_min: string
+    /** Maximum height in inches */
+    height_max: string
+    /** Minimum weight in pounds */
+    weight_min: string
+    /** Maximum weight in pounds */
+    weight_max: string
+  }
+  /** Description of non-conveyable requirements */
+  non_conveyable: string
+}
+
+/**
+ * Label Placement Rule Interface
+ * 
+ * Represents label placement requirements and violations.
+ */
+export interface LabelPlacementRule {
+  /** Label placement requirement description */
+  requirement: string
+  /** Standard positioning (e.g., '2 inches from bottom, 2 inches from right') */
+  standard_position: string
+  /** Special cases for placement */
+  special_cases: string[]
+  /** Fine for incorrect placement */
+  violation_fine: string
+}
+
+/**
+ * Timing Requirement Interface
+ * 
+ * Represents critical timing requirements and deadlines.
+ */
+export interface TimingRequirement {
+  /** Timing requirement name (e.g., 'ASN Submission', 'Routing Request') */
+  requirement: string
+  /** Deadline description (e.g., 'within 1 hour of shipment') */
+  deadline: string
+  /** Specific timeframe */
+  timeframe: string
+  /** Fine for missing deadline */
+  violation_fine: string
+}
+
+/**
+ * Product Requirement Interface
+ * 
+ * Represents product category-specific requirements.
+ */
+export interface ProductRequirement {
+  /** Product category (e.g., 'Apparel', 'Footwear', 'Electronics') */
+  category: string
+  /** Specific requirements for this category */
+  requirements: string[]
+  /** Special rules for this category */
+  special_rules: string[]
+  /** Common violations for this category */
+  violations: string[]
+}
+
+/**
+ * Comprehensive Parsed Data Interface
+ * 
+ * Represents the complete structure returned by the enhanced parser.
+ */
+export interface ParsedRoutingGuideData {
+  /** Array of compliance requirements and violations */
+  requirements: Violation[]
+  /** Different order types and their rules */
+  order_types: OrderType[]
+  /** Carton dimensional and weight specifications */
+  carton_specs: CartonSpecs
+  /** Label placement rules and requirements */
+  label_placement: LabelPlacementRule[]
+  /** Critical timing requirements */
+  timing_requirements: TimingRequirement[]
+  /** Product category-specific requirements */
+  product_requirements: ProductRequirement[]
+}
+
