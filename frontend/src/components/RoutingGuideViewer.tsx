@@ -111,7 +111,7 @@ const TabNavigation: React.FC<{
 const OverviewTab: React.FC<{ data: ParsedRoutingGuideData }> = ({ data }) => {
   const totalViolations = data.requirements.length;
   const highRiskViolations = data.requirements.filter(v => v.severity === 'High').length;
-  const totalFineExposure = data.requirements.reduce((sum, v) => sum + (v.fine_amount || 0), 0);
+  // const totalFineExposure = data.requirements.reduce((sum, v) => sum + (v.fine_amount || 0), 0);
 
   return (
     <div className="space-y-8">

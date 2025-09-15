@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { AlertTriangle, DollarSign, Calendar, Building, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle, DollarSign, Calendar, Building } from 'lucide-react';
 import { Violation } from '../types';
 import { SeverityBadge } from './ui/SeverityBadge';
 import { CategoryBadge } from './ui/CategoryBadge';

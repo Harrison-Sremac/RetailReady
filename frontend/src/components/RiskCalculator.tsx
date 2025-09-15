@@ -10,12 +10,12 @@
  */
 
 import React from 'react';
-import { Calculator, AlertTriangle, DollarSign, TrendingUp, Info, RefreshCw } from 'lucide-react';
+import { Calculator, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Violation } from '../types';
 import { useRiskCalculation } from '../hooks/useRiskCalculation';
 import { SeverityBadge } from './ui/SeverityBadge';
 import { LoadingSpinner } from './ui/LoadingSpinner';
-import { RISK_CONFIG, ERROR_MESSAGES } from '../utils/constants';
+import { RISK_CONFIG } from '../utils/constants';
 
 /**
  * Component props

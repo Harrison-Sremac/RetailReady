@@ -48,7 +48,7 @@ interface UseRiskCalculationReturn {
  *   setUnits
  * } = useRiskCalculation(violations);
  */
-export function useRiskCalculation(violations: Violation[]): UseRiskCalculationReturn {
+export function useRiskCalculation(_violations: Violation[]): UseRiskCalculationReturn {
   // State management
   const [selectedViolationId, setSelectedViolationId] = useState<number | null>(null);
   const [units, setUnits] = useState<number>(RISK_CONFIG.DEFAULT_UNITS);

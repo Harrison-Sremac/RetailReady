@@ -313,7 +313,7 @@ export function validateFile(file: File): { valid: boolean; error?: string } {
   }
 
   // Check file size
-  if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE) {
+  if (file.size > UPLOAD_CONFIG.MAX_SIZE) {
     return {
       valid: false,
       error: ERROR_MESSAGES.FILE_TOO_LARGE

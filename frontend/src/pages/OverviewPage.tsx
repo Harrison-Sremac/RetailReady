@@ -8,7 +8,6 @@
  * @version 1.0.0
  */
 
-import { useMemo } from 'react';
 import { UploadZone } from '../components/UploadZone';
 import { useApp } from '../contexts/AppContext';
 
@@ -20,10 +19,10 @@ import { useApp } from '../contexts/AppContext';
  * @returns JSX element
  */
 export function OverviewPage() {
-  const { violations, loading, error, apiConnected, parsedRoutingGuideData, setParsedRoutingGuideData, refreshData } = useApp();
+  const { violations, loading, error, apiConnected, setParsedRoutingGuideData, refreshData } = useApp();
 
   // Handle successful file upload
-  const handleUploadSuccess = async (data?: ParsedRoutingGuideData) => {
+  const handleUploadSuccess = async (data?: any) => {
     try {
       if (data) {
         setParsedRoutingGuideData(data);

@@ -9,7 +9,7 @@
  * @version 1.0.0
  */
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Violation, ParsedRoutingGuideData } from '../types';
 import { violationsApi } from '../utils/api';
 
