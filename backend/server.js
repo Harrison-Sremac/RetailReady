@@ -24,6 +24,8 @@ const createUploadRouter = require('./routes/upload');
 const createRiskRouter = require('./routes/risk');
 const createRiskOverviewRouter = require('./routes/riskOverview');
 const createWorkerRouter = require('./routes/worker');
+const createTaskAssignmentRouter = require('./routes/taskAssignment');
+const createWorkerManagementRouter = require('./routes/workerManagement');
 
 /**
  * Application configuration
@@ -162,7 +164,19 @@ class RetailReadyServer {
           'GET /api/worker/:workerId/performance': 'Get worker performance metrics',
           'GET /api/worker/leaderboard': 'Get worker leaderboard',
           'GET /api/worker/:workerId/guidance/:orderBarcode': 'Get guidance for specific order',
-          'GET /api/worker': 'Get all workers'
+          'GET /api/worker': 'Get all workers',
+          'POST /api/task-assignment/breakdown': 'Break down order into compliance tasks',
+          'POST /api/task-assignment/optimize': 'Optimize task assignments for order',
+          'GET /api/task-assignment/worker/:workerId/profile': 'Get worker skill profile',
+          'GET /api/task-assignment/workers': 'Get all workers with skill profiles',
+          'POST /api/task-assignment/simulate': 'Simulate different assignment strategies',
+          'GET /api/task-assignment/stats': 'Get task assignment statistics',
+          'POST /api/task-assignment/complete-task': 'Complete a specific task assignment',
+          'GET /api/worker-management/dashboard': 'Get worker management dashboard data',
+          'GET /api/worker-management/worker/:workerId/details': 'Get detailed worker performance data',
+          'POST /api/worker-management/intervention': 'Schedule worker intervention',
+          'GET /api/worker-management/interventions': 'Get all scheduled interventions',
+          'GET /api/worker-management/analytics': 'Get worker management analytics'
         },
         status: 'OK',
         timestamp: new Date().toISOString()
@@ -175,6 +189,8 @@ class RetailReadyServer {
     this.app.use('/api/risk', createRiskRouter(this.db));
     this.app.use('/api/risk/overview', createRiskOverviewRouter());
     this.app.use('/api/worker', createWorkerRouter(this.db));
+    this.app.use('/api/task-assignment', createTaskAssignmentRouter(this.db));
+    this.app.use('/api/worker-management', createWorkerManagementRouter(this.db));
 
     // Serve React app for client-side routing in production
     if (config.environment === 'production') {

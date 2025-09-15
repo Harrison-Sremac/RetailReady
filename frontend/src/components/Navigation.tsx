@@ -24,7 +24,9 @@ export function Navigation() {
     { path: '/', label: 'Overview' },
     { path: '/compliance', label: 'Compliance' },
     { path: '/risk', label: 'Risk Management' },
+    { path: '/task-assignment', label: 'Task Assignment' },
     { path: '/workers', label: 'Worker Tools' },
+    { path: '/worker-management', label: 'Worker Management' },
     { path: '/analytics', label: 'Analytics' }
   ];
 

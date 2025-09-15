@@ -86,6 +86,33 @@ const dbConfig = {
         warnings TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
+    `,
+    task_completions: `
+      CREATE TABLE IF NOT EXISTS task_completions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_id TEXT NOT NULL,
+        worker_id TEXT NOT NULL,
+        order_id TEXT NOT NULL,
+        status TEXT DEFAULT 'completed',
+        violations_occurred TEXT DEFAULT '[]',
+        violations_prevented TEXT DEFAULT '[]',
+        actual_time INTEGER,
+        notes TEXT,
+        completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (worker_id) REFERENCES workers(worker_id)
+      )
+    `,
+    worker_interventions: `
+      CREATE TABLE IF NOT EXISTS worker_interventions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        worker_id TEXT NOT NULL,
+        intervention_type TEXT NOT NULL,
+        scheduled_date DATETIME,
+        notes TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        completed_at DATETIME,
+        FOREIGN KEY (worker_id) REFERENCES workers(worker_id)
+      )
     `
   },
   

@@ -16,6 +16,8 @@ import { CompliancePage } from './pages/CompliancePage';
 import { RiskPage } from './pages/RiskPage';
 import { WorkersPage } from './pages/WorkersPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
+import TaskAssignmentPage from './pages/TaskAssignmentPage';
+import WorkerManagementPage from './pages/WorkerManagementPage';
 
 /**
  * Main Application Component
@@ -35,7 +37,9 @@ function App() {
             <Route path="/compliance" element={<CompliancePage />} />
             <Route path="/risk" element={<RiskPage />} />
             <Route path="/workers" element={<WorkersPage />} />
+            <Route path="/worker-management" element={<WorkerManagementPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/task-assignment" element={<TaskAssignmentPage />} />
           </Routes>
         </div>
       </Router>
