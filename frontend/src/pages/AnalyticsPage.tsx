@@ -8,10 +8,9 @@
  * @version 1.0.0
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { Violation, ParsedRoutingGuideData } from '../types';
-import { violationsApi } from '../utils/api';
+import { useMemo } from 'react';
 import { RoutingGuideViewer } from '../components/RoutingGuideViewer';
+import { useApp } from '../contexts/AppContext';
 
 /**
  * Analytics Page Component
@@ -21,33 +20,7 @@ import { RoutingGuideViewer } from '../components/RoutingGuideViewer';
  * @returns JSX element
  */
 export function AnalyticsPage() {
-  const [violations, setViolations] = useState<Violation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [apiConnected, setApiConnected] = useState(false);
-  const [parsedRoutingGuideData, setParsedRoutingGuideData] = useState<ParsedRoutingGuideData | null>(null);
-
-  // Test API connection on mount
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        const response = await violationsApi.getAll({});
-        if (response.success) {
-          setApiConnected(true);
-          setViolations(response.data || []);
-        } else {
-          setError('API returned an error');
-        }
-      } catch (err) {
-        console.error('API connection failed:', err);
-        setError('Cannot connect to backend API');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    testConnection();
-  }, []);
+  const { violations, loading, error, apiConnected, parsedRoutingGuideData } = useApp();
 
   // Get unique values for analytics
   const categories = useMemo(() => [...new Set(violations.map(v => v.category))], [violations]);

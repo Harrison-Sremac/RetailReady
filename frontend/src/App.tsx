@@ -9,6 +9,7 @@
  */
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AppProvider } from './contexts/AppContext';
 import { Navigation } from './components/Navigation';
 import { OverviewPage } from './pages/OverviewPage';
 import { CompliancePage } from './pages/CompliancePage';
@@ -25,18 +26,20 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
  */
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<OverviewPage />} />
-          <Route path="/compliance" element={<CompliancePage />} />
-          <Route path="/risk" element={<RiskPage />} />
-          <Route path="/workers" element={<WorkersPage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-        </Routes>
-      </div>
-    </Router>
+    <AppProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
+          <Navigation />
+          <Routes>
+            <Route path="/" element={<OverviewPage />} />
+            <Route path="/compliance" element={<CompliancePage />} />
+            <Route path="/risk" element={<RiskPage />} />
+            <Route path="/workers" element={<WorkersPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+          </Routes>
+        </div>
+      </Router>
+    </AppProvider>
   );
 }
 

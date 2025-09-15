@@ -8,11 +8,9 @@
  * @version 1.0.0
  */
 
-import { useState, useEffect } from 'react';
-import { Violation } from '../types';
-import { violationsApi } from '../utils/api';
 import { RiskCalculator } from '../components/RiskCalculator';
 import { RiskOverviewDemo } from '../components/RiskOverviewDemo';
+import { useApp } from '../contexts/AppContext';
 
 /**
  * Risk Management Page Component
@@ -22,32 +20,7 @@ import { RiskOverviewDemo } from '../components/RiskOverviewDemo';
  * @returns JSX element
  */
 export function RiskPage() {
-  const [violations, setViolations] = useState<Violation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [apiConnected, setApiConnected] = useState(false);
-
-  // Test API connection on mount
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        const response = await violationsApi.getAll({});
-        if (response.success) {
-          setApiConnected(true);
-          setViolations(response.data || []);
-        } else {
-          setError('API returned an error');
-        }
-      } catch (err) {
-        console.error('API connection failed:', err);
-        setError('Cannot connect to backend API');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    testConnection();
-  }, []);
+  const { violations, loading, error, apiConnected } = useApp();
 
   if (loading) {
     return (

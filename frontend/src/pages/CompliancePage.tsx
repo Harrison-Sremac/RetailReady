@@ -8,11 +8,11 @@
  * @version 1.0.0
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { Violation, Filters } from '../types';
-import { violationsApi } from '../utils/api';
+import { useState, useMemo } from 'react';
+import { Filters } from '../types';
 import { FilterBar } from '../components/FilterBar';
 import { ViolationsList } from '../components/ViolationsList';
+import { useApp } from '../contexts/AppContext';
 
 /**
  * Compliance Page Component
@@ -22,37 +22,12 @@ import { ViolationsList } from '../components/ViolationsList';
  * @returns JSX element
  */
 export function CompliancePage() {
-  const [violations, setViolations] = useState<Violation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [apiConnected, setApiConnected] = useState(false);
+  const { violations, loading, error, apiConnected } = useApp();
   const [filters, setFilters] = useState<Filters>({
     category: '',
     severity: '',
     retailer: ''
   });
-
-  // Test API connection on mount
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        const response = await violationsApi.getAll({});
-        if (response.success) {
-          setApiConnected(true);
-          setViolations(response.data || []);
-        } else {
-          setError('API returned an error');
-        }
-      } catch (err) {
-        console.error('API connection failed:', err);
-        setError('Cannot connect to backend API');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    testConnection();
-  }, []);
 
   // Filter violations based on current filters
   const filteredViolations = useMemo(() => {

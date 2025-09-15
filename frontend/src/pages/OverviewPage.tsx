@@ -8,10 +8,9 @@
  * @version 1.0.0
  */
 
-import { useState, useEffect, useMemo } from 'react';
-import { Violation, ParsedRoutingGuideData } from '../types';
-import { violationsApi } from '../utils/api';
+import { useMemo } from 'react';
 import { UploadZone } from '../components/UploadZone';
+import { useApp } from '../contexts/AppContext';
 
 /**
  * Overview Page Component
@@ -21,33 +20,7 @@ import { UploadZone } from '../components/UploadZone';
  * @returns JSX element
  */
 export function OverviewPage() {
-  const [violations, setViolations] = useState<Violation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [apiConnected, setApiConnected] = useState(false);
-  const [parsedRoutingGuideData, setParsedRoutingGuideData] = useState<ParsedRoutingGuideData | null>(null);
-
-  // Test API connection on mount
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        const response = await violationsApi.getAll({});
-        if (response.success) {
-          setApiConnected(true);
-          setViolations(response.data || []);
-        } else {
-          setError('API returned an error');
-        }
-      } catch (err) {
-        console.error('API connection failed:', err);
-        setError('Cannot connect to backend API');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    testConnection();
-  }, []);
+  const { violations, loading, error, apiConnected, parsedRoutingGuideData, setParsedRoutingGuideData, refreshData } = useApp();
 
   // Handle successful file upload
   const handleUploadSuccess = async (data?: ParsedRoutingGuideData) => {
@@ -56,10 +29,7 @@ export function OverviewPage() {
         setParsedRoutingGuideData(data);
       }
       // Refresh violations data
-      const response = await violationsApi.getAll({});
-      if (response.success && response.data) {
-        setViolations(response.data);
-      }
+      await refreshData();
     } catch (err) {
       console.error('Error refreshing data after upload:', err);
     }
