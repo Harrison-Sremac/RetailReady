@@ -84,7 +84,7 @@ export const RiskOverviewDemo: React.FC = () => {
   useEffect(() => {
     const loadMockData = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/risk/overview/mock-data');
+        const response = await fetch('/api/risk/overview/mock-data');
         const data = await response.json();
         if (data.success) {
           setMockData(data.data);
