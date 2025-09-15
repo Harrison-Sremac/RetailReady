@@ -8,10 +8,14 @@ import { Filters } from '../types'
 interface FilterBarProps {
   /** Array of available categories for filtering */
   categories: string[]
+  /** Array of available severities for filtering */
+  severities: string[]
+  /** Array of available retailers for filtering */
+  retailers: string[]
   /** Current filter values */
   filters: Filters
   /** Callback function when filters change */
-  onFilterChange: (filters: Filters) => void
+  onFiltersChange: (filters: Filters) => void
 }
 
 /**
@@ -38,12 +42,12 @@ interface FilterBarProps {
  * />
  */
 export const FilterBar: React.FC<FilterBarProps> = ({ 
-  categories, 
+  categories,
+  severities,
+  retailers,
   filters, 
-  onFilterChange 
+  onFiltersChange 
 }) => {
-  const severityOptions = ['High', 'Medium', 'Low']
-  const retailerOptions = ["Dick's Sporting Goods", "Uploaded Document"]
 
   /**
    * Handle category filter change
@@ -51,7 +55,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
    * @param category - Selected category value
    */
   const handleCategoryChange = (category: string) => {
-    onFilterChange({ ...filters, category })
+    onFiltersChange({ ...filters, category })
   }
 
   /**
@@ -60,7 +64,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
    * @param severity - Selected severity value
    */
   const handleSeverityChange = (severity: string) => {
-    onFilterChange({ ...filters, severity })
+    onFiltersChange({ ...filters, severity })
   }
 
   /**
@@ -69,14 +73,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
    * @param retailer - Selected retailer value
    */
   const handleRetailerChange = (retailer: string) => {
-    onFilterChange({ ...filters, retailer })
+    onFiltersChange({ ...filters, retailer })
   }
 
   /**
    * Clear all active filters
    */
   const clearFilters = () => {
-    onFilterChange({ category: '', severity: '', retailer: '' })
+    onFiltersChange({ category: '', severity: '', retailer: '' })
   }
 
   const hasActiveFilters = filters.category || filters.severity || filters.retailer
@@ -131,7 +135,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">All Severities</option>
-            {severityOptions.map((severity) => (
+            {severities.map((severity) => (
               <option key={severity} value={severity}>
                 {severity}
               </option>
@@ -150,7 +154,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">All Retailers</option>
-            {retailerOptions.map((retailer) => (
+            {retailers.map((retailer) => (
               <option key={retailer} value={retailer}>
                 {retailer}
               </option>

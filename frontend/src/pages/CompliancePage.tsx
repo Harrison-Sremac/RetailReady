@@ -50,8 +50,8 @@ export function CompliancePage() {
 
   // Get unique values for filter options
   const categories = useMemo(() => [...new Set(violations.map(v => v.category))], [violations]);
-  // const severities = useMemo(() => [...new Set(violations.map(v => v.severity))], [violations]);
-  // const retailers = useMemo(() => [...new Set(violations.map(v => v.retailer))], [violations]);
+  const severities = useMemo(() => [...new Set(violations.map(v => v.severity))], [violations]);
+  const retailers = useMemo(() => [...new Set(violations.map(v => v.retailer))], [violations]);
 
   if (loading) {
     return (
@@ -107,8 +107,10 @@ export function CompliancePage() {
           <h2 className="text-xl font-semibold mb-4">Filter Requirements</h2>
           <FilterBar 
             filters={filters}
-            onFilterChange={setFilters}
+            onFiltersChange={setFilters}
             categories={categories}
+            severities={severities}
+            retailers={retailers}
           />
         </div>
 
