@@ -13,7 +13,7 @@
  * API Configuration
  */
 // Dynamic API base URL - use current origin in production, localhost in development
-const API_BASE_URL = import.meta.env.PROD 
+const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname !== 'localhost'
   ? `${window.location.origin}/api`
   : 'http://localhost:3001/api';
 
