@@ -107,7 +107,7 @@ export const RiskOverviewDemo: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3001/api/risk/overview', {
+      const response = await fetch('/api/risk/overview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

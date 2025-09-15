@@ -84,7 +84,7 @@ function WorkerInterface() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:3001/api/worker/scan', {
+      const response = await fetch('/api/worker/scan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ function WorkerInterface() {
     if (!currentScan) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/worker/scan/${currentScan.scanId}/complete`, {
+      const response = await fetch(`/api/worker/scan/${currentScan.scanId}/complete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
