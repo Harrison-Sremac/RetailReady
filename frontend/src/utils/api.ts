@@ -121,27 +121,7 @@ export const violationsApi = {
     return apiRequest<string[]>(API_CONFIG.ENDPOINTS.RETAILERS);
   },
 
-  /**
-   * Get organized database view by retailer and category
-   * 
-   * @returns Promise with database view data
-   */
-  async getDatabaseView(): Promise<ApiResponse<any>> {
-    return apiRequest<any>(API_CONFIG.ENDPOINTS.DATABASE_VIEW);
-  },
 
-  /**
-   * Get detailed view for specific retailer/category
-   * 
-   * @param retailer - Retailer name
-   * @param category - Category name
-   * @returns Promise with detailed view data
-   */
-  async getDetailedView(retailer: string, category: string): Promise<ApiResponse<any>> {
-    const encodedRetailer = encodeURIComponent(retailer);
-    const encodedCategory = encodeURIComponent(category);
-    return apiRequest<any>(`${API_CONFIG.ENDPOINTS.DATABASE_VIEW}/${encodedRetailer}/${encodedCategory}`);
-  }
 };
 
 /**

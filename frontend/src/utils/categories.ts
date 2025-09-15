@@ -43,7 +43,7 @@ export const WORKFLOW_CATEGORIES: Record<string, WorkflowCategory> = {
     responsibleParties: ['Supervisor', 'Warehouse Worker'],
     riskLevel: 'HIGH',
     color: 'blue',
-    icon: '📋'
+    icon: 'prep'
   },
   'During Packing': {
     name: 'During Packing',
@@ -53,7 +53,7 @@ export const WORKFLOW_CATEGORIES: Record<string, WorkflowCategory> = {
     responsibleParties: ['Warehouse Worker'],
     riskLevel: 'HIGH',
     color: 'green',
-    icon: '📦'
+    icon: 'packing'
   },
   'Post-Packing': {
     name: 'Post-Packing',
@@ -63,7 +63,7 @@ export const WORKFLOW_CATEGORIES: Record<string, WorkflowCategory> = {
     responsibleParties: ['Warehouse Worker'],
     riskLevel: 'MEDIUM',
     color: 'yellow',
-    icon: '🏷️'
+    icon: 'label'
   },
   'Pre-Shipment': {
     name: 'Pre-Shipment',
@@ -73,7 +73,7 @@ export const WORKFLOW_CATEGORIES: Record<string, WorkflowCategory> = {
     responsibleParties: ['Supervisor', 'Shipping Clerk'],
     riskLevel: 'CRITICAL',
     color: 'red',
-    icon: '🚚'
+    icon: 'shipment'
   },
   'EDI/Digital': {
     name: 'EDI/Digital',
@@ -83,7 +83,7 @@ export const WORKFLOW_CATEGORIES: Record<string, WorkflowCategory> = {
     responsibleParties: ['IT System', 'System Administrator'],
     riskLevel: 'CRITICAL',
     color: 'purple',
-    icon: '💻'
+    icon: 'digital'
   },
   'Carrier/Routing': {
     name: 'Carrier/Routing',
@@ -93,7 +93,7 @@ export const WORKFLOW_CATEGORIES: Record<string, WorkflowCategory> = {
     responsibleParties: ['Logistics Coordinator', 'IT System'],
     riskLevel: 'MEDIUM',
     color: 'orange',
-    icon: '🚛'
+    icon: 'routing'
   }
 }
 

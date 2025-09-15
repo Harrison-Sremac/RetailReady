@@ -22,6 +22,7 @@ const { initializeCompleteDatabase, closeDatabase } = require('./config/database
 const createViolationsRouter = require('./routes/violations');
 const createUploadRouter = require('./routes/upload');
 const createRiskRouter = require('./routes/risk');
+const createRiskOverviewRouter = require('./routes/riskOverview');
 const createWorkerRouter = require('./routes/worker');
 
 /**
@@ -145,6 +146,9 @@ class RetailReadyServer {
           'POST /api/risk/batch': 'Calculate risk scores for multiple violations',
           'POST /api/risk/estimate': 'Estimate fine without database lookup',
           'GET /api/risk/config': 'Get risk calculation configuration',
+          'POST /api/risk/overview': 'Get risk overview for order/worker combination',
+          'GET /api/risk/overview/mock-data': 'Get available mock data for demo',
+          'GET /api/risk/overview/config': 'Get risk overview service configuration',
           'POST /api/worker/scan': 'Create worker scan and get contextual guidance',
           'POST /api/worker/scan/:scanId/complete': 'Complete worker scan with results',
           'GET /api/worker/:workerId/performance': 'Get worker performance metrics',
@@ -161,6 +165,7 @@ class RetailReadyServer {
     this.app.use('/api/violations', createViolationsRouter(this.db));
     this.app.use('/api/upload', createUploadRouter(this.db));
     this.app.use('/api/risk', createRiskRouter(this.db));
+    this.app.use('/api/risk/overview', createRiskOverviewRouter());
     this.app.use('/api/worker', createWorkerRouter(this.db));
 
     // 404 handler for undefined routes

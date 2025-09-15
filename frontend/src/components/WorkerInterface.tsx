@@ -293,7 +293,7 @@ function WorkerInterface() {
 
         {/* Gamification */}
         <div className="text-center text-sm text-gray-600 mb-4">
-          Streak: 🔥 {currentScan.performance.streak} perfect orders today!
+          Streak: {currentScan.performance.streak} perfect orders today!
         </div>
 
         {/* Start new scan button */}
@@ -374,9 +374,12 @@ function WorkerInterface() {
         <div className="bg-gray-100 rounded-lg p-4">
           <h3 className="font-bold text-gray-900 mb-2">Demo Worker IDs:</h3>
           <div className="space-y-1 text-sm text-gray-600">
-            <div>• maria123 - Maria Rodriguez</div>
+            <div>• johnny123 - Johnny Appleseed</div>
             <div>• john456 - John Smith</div>
             <div>• sarah789 - Sarah Johnson</div>
+            <div>• mike001 - Mike Rodriguez</div>
+            <div>• lisa002 - Lisa Chen</div>
+            <div>• maria008 - Maria Garcia</div>
           </div>
         </div>
       </div>

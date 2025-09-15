@@ -19,7 +19,6 @@ export const API_CONFIG = {
     VIOLATIONS: 'http://localhost:3001/api/violations',
     CATEGORIES: 'http://localhost:3001/api/violations/categories',
     RETAILERS: 'http://localhost:3001/api/violations/retailers',
-    DATABASE_VIEW: 'http://localhost:3001/api/violations/database-view',
     UPLOAD: 'http://localhost:3001/api/upload',
     UPLOAD_VALIDATE: 'http://localhost:3001/api/upload/validate',
     UPLOAD_INFO: 'http://localhost:3001/api/upload/info',
@@ -28,7 +27,6 @@ export const API_CONFIG = {
     RISK_ESTIMATE: 'http://localhost:3001/api/risk/estimate',
     RISK_CONFIG: 'http://localhost:3001/api/risk/config',
     WORKER_SCAN: 'http://localhost:3001/api/worker/scan',
-    WORKER_LEADERBOARD: 'http://localhost:3001/api/worker/leaderboard',
     WORKER_PERFORMANCE: 'http://localhost:3001/api/worker'
   }
 } as const;

@@ -340,7 +340,7 @@ const ProductRequirementsTab: React.FC<{ productRequirements: any[] }> = ({ prod
                       <ul className="space-y-1">
                         {product.special_rules.map((rule: string, ruleIndex: number) => (
                           <li key={ruleIndex} className="text-sm text-gray-700 flex items-start space-x-2">
-                            <span className="text-yellow-600 mt-0.5">⚠</span>
+                            <span className="text-yellow-600 mt-0.5">!</span>
                             <span>{rule}</span>
                           </li>
                         ))}

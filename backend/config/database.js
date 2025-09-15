@@ -179,6 +179,66 @@ const dbConfig = {
       worker_id: "sarah789",
       name: "Sarah Johnson",
       department: "Packaging"
+    },
+    {
+      worker_id: "mike001",
+      name: "Mike Rodriguez",
+      department: "Warehouse"
+    },
+    {
+      worker_id: "lisa002",
+      name: "Lisa Chen",
+      department: "Quality Control"
+    },
+    {
+      worker_id: "david003",
+      name: "David Wilson",
+      department: "Packaging"
+    },
+    {
+      worker_id: "emma004",
+      name: "Emma Thompson",
+      department: "Warehouse"
+    },
+    {
+      worker_id: "carlos005",
+      name: "Carlos Martinez",
+      department: "Shipping"
+    },
+    {
+      worker_id: "jessica006",
+      name: "Jessica Brown",
+      department: "Packaging"
+    },
+    {
+      worker_id: "alex007",
+      name: "Alex Johnson",
+      department: "Warehouse"
+    },
+    {
+      worker_id: "maria008",
+      name: "Maria Garcia",
+      department: "Quality Control"
+    },
+    {
+      worker_id: "kevin009",
+      name: "Kevin Lee",
+      department: "Packaging"
+    },
+    {
+      worker_id: "rachel010",
+      name: "Rachel Davis",
+      department: "Warehouse"
+    },
+    {
+      worker_id: "tom011",
+      name: "Tom Anderson",
+      department: "Shipping"
+    },
+    {
+      worker_id: "amy012",
+      name: "Amy Taylor",
+      department: "Packaging"
     }
   ]
 };
