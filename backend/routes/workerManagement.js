@@ -429,6 +429,94 @@ function createWorkerManagementRouter(db) {
     }
   });
 
+  /**
+   * POST /api/worker-management/seed-scan-data
+   * Generate mock historical scan data for workers
+   */
+  router.post('/seed-scan-data', async (req, res) => {
+    try {
+      console.log('Seeding worker scan data...');
+      
+      const scanStmt = db.prepare(`
+        INSERT INTO worker_scans (worker_id, order_barcode, sku, carton_id, order_type, retailer, status, violations_prevented, violations_occurred, estimated_fine_saved, estimated_fine_incurred, timestamp) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      
+      // Generate mock scan data for the last 30 days
+      const workers = [
+        { worker_id: 'johnny123', name: 'Johnny Appleseed' },
+        { worker_id: 'john456', name: 'John Smith' },
+        { worker_id: 'sarah789', name: 'Sarah Johnson' },
+        { worker_id: 'mike001', name: 'Mike Rodriguez' },
+        { worker_id: 'lisa002', name: 'Lisa Chen' },
+        { worker_id: 'maria008', name: 'Maria Garcia' },
+        { worker_id: 'kevin009', name: 'Kevin Brown' },
+        { worker_id: 'rachel010', name: 'Rachel Davis' },
+        { worker_id: 'tom011', name: 'Tom Wilson' },
+        { worker_id: 'alex007', name: 'Alex Johnson' },
+        { worker_id: 'amy012', name: 'Amy Taylor' },
+        { worker_id: 'carlos005', name: 'Carlos Martinez' },
+        { worker_id: 'david003', name: 'David Lee' },
+        { worker_id: 'emma014', name: 'Emma White' },
+        { worker_id: 'james013', name: 'James Anderson' }
+      ];
+      
+      const orderTypes = ['Standard', 'Express', 'Bulk', 'Fragile'];
+      const retailers = ['Target', 'Walmart', 'Amazon', 'Best Buy'];
+      const statuses = ['completed', 'completed', 'completed', 'completed', 'completed']; // Mostly successful
+      
+      let seededCount = 0;
+      
+      for (let i = 0; i < 200; i++) {
+        const worker = workers[Math.floor(Math.random() * workers.length)];
+        const daysAgo = Math.floor(Math.random() * 30);
+        const timestamp = new Date();
+        timestamp.setDate(timestamp.getDate() - daysAgo);
+        timestamp.setHours(Math.floor(Math.random() * 12) + 6); // 6 AM to 6 PM
+        timestamp.setMinutes(Math.floor(Math.random() * 60));
+        
+        const hasViolations = Math.random() < 0.15; // 15% chance of violations
+        const violationsOccurred = hasViolations ? JSON.stringify(['Label placement', 'Packaging']) : '[]';
+        const violationsPrevented = Math.random() < 0.3 ? JSON.stringify(['UPC verification']) : '[]';
+        const fineIncurred = hasViolations ? Math.floor(Math.random() * 500) + 50 : 0;
+        const fineSaved = Math.random() < 0.3 ? Math.floor(Math.random() * 200) + 25 : 0;
+        
+        scanStmt.run([
+          worker.worker_id,
+          `ORD-${String(i + 1).padStart(6, '0')}`,
+          `SKU-${Math.floor(Math.random() * 10000)}`,
+          `CARTON-${Math.floor(Math.random() * 1000)}`,
+          orderTypes[Math.floor(Math.random() * orderTypes.length)],
+          retailers[Math.floor(Math.random() * retailers.length)],
+          statuses[Math.floor(Math.random() * statuses.length)],
+          violationsPrevented,
+          violationsOccurred,
+          fineSaved,
+          fineIncurred,
+          timestamp.toISOString()
+        ]);
+        
+        seededCount++;
+      }
+      
+      scanStmt.finalize();
+      
+      res.json({
+        success: true,
+        message: `Successfully seeded ${seededCount} worker scan records`,
+        seeded_count: seededCount
+      });
+
+    } catch (error) {
+      console.error('Error seeding worker scan data:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        message: 'Failed to seed worker scan data'
+      });
+    }
+  });
+
   return router;
 }
 

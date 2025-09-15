@@ -405,7 +405,66 @@ function seedDatabase(db) {
           console.log('Workers already contain data, skipping seed');
         }
         
-        resolve();
+        // Seed worker scan data for historical performance
+        db.get("SELECT COUNT(*) as count FROM worker_scans", (err, row) => {
+          if (err) {
+            console.error('Error checking worker_scans table:', err);
+            reject(err);
+            return;
+          }
+          
+          if (row.count === 0) {
+            console.log('Seeding worker scan data...');
+            
+            const scanStmt = db.prepare(`
+              INSERT INTO worker_scans (worker_id, order_barcode, sku, carton_id, order_type, retailer, status, violations_prevented, violations_occurred, estimated_fine_saved, estimated_fine_incurred, timestamp) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+            
+            // Generate mock scan data for the last 30 days
+            const workers = dbConfig.workerSeedData;
+            const orderTypes = ['Standard', 'Express', 'Bulk', 'Fragile'];
+            const retailers = ['Target', 'Walmart', 'Amazon', 'Best Buy'];
+            const statuses = ['completed', 'completed', 'completed', 'completed', 'completed']; // Mostly successful
+            
+            for (let i = 0; i < 200; i++) {
+              const worker = workers[Math.floor(Math.random() * workers.length)];
+              const daysAgo = Math.floor(Math.random() * 30);
+              const timestamp = new Date();
+              timestamp.setDate(timestamp.getDate() - daysAgo);
+              timestamp.setHours(Math.floor(Math.random() * 12) + 6); // 6 AM to 6 PM
+              timestamp.setMinutes(Math.floor(Math.random() * 60));
+              
+              const hasViolations = Math.random() < 0.15; // 15% chance of violations
+              const violationsOccurred = hasViolations ? JSON.stringify(['Label placement', 'Packaging']) : '[]';
+              const violationsPrevented = Math.random() < 0.3 ? JSON.stringify(['UPC verification']) : '[]';
+              const fineIncurred = hasViolations ? Math.floor(Math.random() * 500) + 50 : 0;
+              const fineSaved = Math.random() < 0.3 ? Math.floor(Math.random() * 200) + 25 : 0;
+              
+              scanStmt.run([
+                worker.worker_id,
+                `ORD-${String(i + 1).padStart(6, '0')}`,
+                `SKU-${Math.floor(Math.random() * 10000)}`,
+                `CARTON-${Math.floor(Math.random() * 1000)}`,
+                orderTypes[Math.floor(Math.random() * orderTypes.length)],
+                retailers[Math.floor(Math.random() * retailers.length)],
+                statuses[Math.floor(Math.random() * statuses.length)],
+                violationsPrevented,
+                violationsOccurred,
+                fineSaved,
+                fineIncurred,
+                timestamp.toISOString()
+              ]);
+            }
+            
+            scanStmt.finalize();
+            console.log('Worker scan data seeded successfully!');
+          } else {
+            console.log('Worker scans already contain data, skipping seed');
+          }
+          
+          resolve();
+        });
       });
     });
   });
