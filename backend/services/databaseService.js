@@ -433,20 +433,19 @@ class DatabaseService {
   }
 
   /**
-   * Clear all uploaded data (violations + worker scans)
-   * Comprehensive clear function for all user-uploaded data
+   * Clear all uploaded data (violations only - preserves worker performance data)
+   * Comprehensive clear function for user-uploaded compliance data only
    * 
    * @returns {Promise<Object>} Object with counts of cleared records
    */
   async clearAllUploadedData() {
     try {
       const violationsCleared = await this.clearUploadedData();
-      const scansCleared = await this.clearWorkerScanData();
       
       return {
         violationsCleared,
-        scansCleared,
-        totalCleared: violationsCleared + scansCleared
+        scansCleared: 0, // Worker scans are preserved
+        totalCleared: violationsCleared
       };
     } catch (error) {
       console.error('Error clearing all uploaded data:', error);

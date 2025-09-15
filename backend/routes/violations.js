@@ -298,7 +298,7 @@ function createViolationsRouter(db) {
   /**
    * DELETE /api/violations/clear-all-uploaded
    * 
-   * Clear all uploaded data (violations + worker scans)
+   * Clear all uploaded compliance data (preserves worker performance data)
    * 
    * @route DELETE /api/violations/clear-all-uploaded
    * @param {Object} req - Express request object
@@ -307,18 +307,18 @@ function createViolationsRouter(db) {
    */
   router.delete('/clear-all-uploaded', async (req, res) => {
     try {
-      console.log('Clearing all uploaded data...');
+      console.log('Clearing all uploaded compliance data...');
       
       const result = await dbService.clearAllUploadedData();
       
-      console.log(`Cleared ${result.totalCleared} total records (${result.violationsCleared} violations, ${result.scansCleared} scans)`);
+      console.log(`Cleared ${result.totalCleared} compliance violations (worker performance data preserved)`);
       
       res.json({
         success: true,
         violations_cleared: result.violationsCleared,
         scans_cleared: result.scansCleared,
         total_cleared: result.totalCleared,
-        message: `Successfully cleared ${result.totalCleared} total records (${result.violationsCleared} violations, ${result.scansCleared} worker scans)`
+        message: `Successfully cleared ${result.totalCleared} compliance violations (worker performance data preserved)`
       });
       
     } catch (error) {

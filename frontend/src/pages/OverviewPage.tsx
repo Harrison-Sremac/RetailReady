@@ -36,7 +36,7 @@ export function OverviewPage() {
 
   // Handle clearing uploaded data
   const handleClearUploadedData = async () => {
-    if (!confirm('Are you sure you want to delete all uploaded data? This will clear violations and worker scan data. This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to delete all uploaded compliance data? This will clear violations but preserve worker performance data. This action cannot be undone.')) {
       return;
     }
 
@@ -47,7 +47,7 @@ export function OverviewPage() {
 
       if (response.ok) {
         const result = await response.json();
-        alert(`Data cleared successfully! Cleared ${result.total_cleared} total records (${result.violations_cleared} violations, ${result.scans_cleared} worker scans)`);
+        alert(`Compliance data cleared successfully! Cleared ${result.total_cleared} violations (worker performance data preserved)`);
         // Refresh violations data
         await refreshData();
       } else {
@@ -124,7 +124,7 @@ export function OverviewPage() {
               Clear All Uploaded Data
             </button>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Remove all uploaded compliance data and worker scan history
+              Remove all uploaded compliance data (preserves worker performance data)
             </p>
           </div>
         </div>
