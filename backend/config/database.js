@@ -373,26 +373,8 @@ function seedDatabase(db) {
       }
       
       if (row.count === 0) {
-        console.log('Seeding database with Dick\'s Sporting Goods compliance data...');
-        
-        const violationStmt = db.prepare(`
-          INSERT INTO violations (requirement, violation, fine, category, severity, retailer) 
-          VALUES (?, ?, ?, ?, ?, ?)
-        `);
-        
-        dbConfig.seedData.forEach(item => {
-          violationStmt.run([
-            item.requirement, 
-            item.violation, 
-            item.fine, 
-            item.category, 
-            item.severity, 
-            "Dick's Sporting Goods"
-          ]);
-        });
-        
-        violationStmt.finalize();
-        console.log('Violations seeded successfully!');
+        console.log('Database is empty - no seed data will be added');
+        console.log('Upload PDF documents to populate compliance requirements');
       } else {
         console.log('Violations already contain data, skipping seed');
       }
