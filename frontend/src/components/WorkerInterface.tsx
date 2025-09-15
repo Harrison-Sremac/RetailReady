@@ -204,25 +204,25 @@ function WorkerInterface() {
         {/* Current step */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           {/* Visual guide */}
-          <div className="bg-gray-100 rounded-lg h-48 mb-4 flex items-center justify-center overflow-hidden">
+          <div className="bg-gray-100 rounded-lg h-96 mb-4 flex items-center justify-center overflow-hidden">
             {currentStep.visual ? (
               <img 
                 src={`/worker-images/${currentStep.visual.endsWith('.png') ? currentStep.visual.replace('.png', '.svg') : currentStep.visual}`}
                 alt="Compliance guidance visual"
-                className="max-w-full max-h-full object-contain"
+                className="w-full h-full object-contain"
                 onError={(e) => {
-                  // Final fallback to emoji
+                  // Final fallback without emoji
                   e.currentTarget.style.display = 'none';
                   const fallbackDiv = document.createElement('div');
                   fallbackDiv.className = 'text-center text-gray-500';
-                  fallbackDiv.innerHTML = '<div class="text-4xl mb-2">📦</div><p class="text-sm">Visual guide</p>';
+                  fallbackDiv.innerHTML = '<div class="text-sm font-medium">Visual Guide</div><p class="text-xs">Image not available</p>';
                   e.currentTarget.parentNode?.appendChild(fallbackDiv);
                 }}
               />
             ) : (
               <div className="text-center text-gray-500">
-                <div className="text-4xl mb-2">📦</div>
-                <p className="text-sm">Visual guide</p>
+                <div className="text-sm font-medium">Visual Guide</div>
+                <p className="text-xs">No image available</p>
               </div>
             )}
           </div>
@@ -246,7 +246,7 @@ function WorkerInterface() {
           {currentStep.specificGuidance && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
               <p className="text-blue-800 text-sm">
-                <strong>💡 Pro Tip:</strong> {currentStep.specificGuidance}
+                <strong>Pro Tip:</strong> {currentStep.specificGuidance}
               </p>
             </div>
           )}
@@ -263,7 +263,7 @@ function WorkerInterface() {
         {/* Performance stats */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <h3 className="font-bold text-gray-900 mb-3">Today's Stats</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-3 gap-4 text-sm">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
                 {currentScan.performance.scansToday}
@@ -277,12 +277,6 @@ function WorkerInterface() {
               <div className="text-gray-600">accuracy</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">
-                {currentScan.performance.streak}
-              </div>
-              <div className="text-gray-600">perfect streak</div>
-            </div>
-            <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
                 ${currentScan.performance.finesSaved}
               </div>
@@ -291,10 +285,6 @@ function WorkerInterface() {
           </div>
         </div>
 
-        {/* Gamification */}
-        <div className="text-center text-sm text-gray-600 mb-4">
-          Streak: {currentScan.performance.streak} perfect orders today!
-        </div>
 
         {/* Start new scan button */}
         <button

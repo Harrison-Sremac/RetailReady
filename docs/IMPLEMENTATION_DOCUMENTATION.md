@@ -1,5 +1,7 @@
 # RetailReady Implementation Documentation
 
+**Author:** Harrison Sremac
+
 ## Overview
 RetailReady is a comprehensive warehouse compliance management system that helps businesses track, analyze, and prevent compliance violations. The application provides AI-powered document parsing, risk assessment, worker management, and real-time compliance monitoring.
 

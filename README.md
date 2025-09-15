@@ -1,8 +1,10 @@
 # RetailReady - AI-Powered Compliance Management Platform
 
+**Author:** Harrison Sremac
+
 A comprehensive compliance risk assessment platform that helps retailers and suppliers manage compliance requirements, assess risks, and calculate potential fines using AI-powered document parsing. Built with modern web technologies and designed for enterprise use.
 
-## 🚀 Quick Deploy to Railway
+## Quick Deploy to Railway
 
 Deploy this application to Railway in minutes:
 
@@ -15,9 +17,9 @@ Deploy this application to Railway in minutes:
 5. **Add a persistent volume** mounted at `/data` for the database
 6. **Deploy!** Railway will automatically build and deploy your app
 
-📖 **Detailed deployment guide**: See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md)
+**Detailed deployment guide**: See [RAILWAY_DEPLOYMENT.md](./docs/RAILWAY_DEPLOYMENT.md)
 
-🔧 **Quick deploy script**: Run `npm run railway:deploy` (requires Railway CLI)
+**Quick deploy script**: Run `npm run railway:deploy` (requires Railway CLI)
 
 ## Features
 
@@ -327,8 +329,16 @@ retailReady2/
 │   │   └── worker-images/      # Worker guidance images
 │   ├── package.json            # Frontend dependencies
 │   └── vite.config.ts          # Vite configuration
-├── ARCHITECTURE.md             # Detailed architecture documentation
-├── IMPLEMENTATION_DOCUMENTATION.md # Implementation details
+├── docs/                       # Documentation
+│   ├── ARCHITECTURE.md         # Detailed architecture documentation
+│   ├── IMPLEMENTATION_DOCUMENTATION.md # Implementation details
+│   └── RAILWAY_DEPLOYMENT.md   # Railway deployment guide
+├── scripts/                    # Build and deployment scripts
+│   ├── build.sh               # Build script
+│   └── deploy-to-railway.sh   # Railway deployment script
+├── assets/                     # Static assets
+│   ├── pp.webp                # Profile picture
+│   └── Dicks Routing Guide (1).pdf # Sample routing guide
 └── README.md                   # This file
 ```
 
@@ -614,7 +624,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Contact Information
 
-- **Project Maintainer**: RetailReady Team
+- **Project Maintainer**: Harrison Sremac
 - **Repository**: [GitHub Repository](https://github.com/Harrison-Sremac/RetailReady)
 - **Issues**: [GitHub Issues](https://github.com/Harrison-Sremac/RetailReady/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/Harrison-Sremac/RetailReady/discussions)

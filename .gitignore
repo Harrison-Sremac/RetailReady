@@ -11,41 +11,21 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-compliance.db
-
-# Uploaded files
-backend/uploads/*
-!backend/uploads/.gitkeep
-
 # Build outputs
 dist/
 build/
-.next/
-out/
+*.tgz
+*.tar.gz
 
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
 # Logs
 logs/
 *.log
+server.log
 
 # Runtime data
 pids/
@@ -69,12 +49,6 @@ jspm_packages/
 # Optional eslint cache
 .eslintcache
 
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
 # Optional REPL history
 .node_repl_history
 
@@ -88,26 +62,50 @@ jspm_packages/
 .cache
 .parcel-cache
 
-# Temporary folders
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Uploads directory
+uploads/
+backend/uploads/
+
+# Temporary files
 tmp/
 temp/
-
-# Lock files (keep package-lock.json but ignore others)
-yarn.lock
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Optional stylelint cache
-.stylelintcache
-
-# SvelteKit build / generate output
-.svelte-kit
-
-# Vite build output
-dist-ssr
-
-# Playwright
-test-results/
-playwright-report/
-playwright/.cache/

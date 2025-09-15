@@ -230,7 +230,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({ onUploadSuccess }) => {
             <span className="text-sm font-medium block">{message.text}</span>
             {message.type === 'success' && (
               <span className="text-xs text-green-600 mt-1 block">
-                ✅ Compliance data loaded • Risk calculator ready • Routing guide analysis available
+                Compliance data loaded • Risk calculator ready • Routing guide analysis available
               </span>
             )}
           </div>

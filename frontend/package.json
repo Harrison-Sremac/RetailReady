@@ -12,7 +12,7 @@
     "risk-assessment",
     "tailwindcss"
   ],
-  "author": "RetailReady Team",
+  "author": "Harrison Sremac",
   "license": "MIT",
   "scripts": {
     "dev": "vite",

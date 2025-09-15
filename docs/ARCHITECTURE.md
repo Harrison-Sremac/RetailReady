@@ -1,5 +1,7 @@
 # RetailReady Architecture Guide
 
+**Author:** Harrison Sremac
+
 ## Overview
 
 RetailReady is a compliance management system that helps retailers and suppliers manage compliance requirements, assess risks, and calculate potential fines. The system uses AI-powered document parsing to extract compliance data from PDF documents and provides comprehensive risk assessment tools.

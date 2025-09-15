@@ -309,7 +309,7 @@ class WorkerService {
       step: 1,
       instruction: "Verify order details match the barcode",
       visual: "order-verification-guide.png",
-      warning: "❌ Wrong order = $500+ processing fee",
+      warning: "Wrong order = $500+ processing fee",
       nextAction: "Confirm order number, retailer, and items"
     });
     
@@ -322,7 +322,7 @@ class WorkerService {
         instruction: this.getBoxSelectionInstruction(orderType),
         visual: "box-size-guide.png",
         warning: highRiskPackaging ? 
-          `❌ Wrong box = ${highRiskPackaging.fine}` : null,
+          `Wrong box = ${highRiskPackaging.fine}` : null,
         nextAction: "Measure items and select appropriate box",
         specificGuidance: this.getSpecificBoxGuidance(orderType)
       });
@@ -337,7 +337,7 @@ class WorkerService {
         instruction: "Place UCC-128 label exactly 2 inches from bottom-right corner",
         visual: "label-placement-guide.png",
         warning: highRiskLabeling ? 
-          `❌ Wrong placement = ${highRiskLabeling.fine}` : null,
+          `Wrong placement = ${highRiskLabeling.fine}` : null,
         nextAction: "Measure 2 inches from bottom-right corner and apply label",
         specificGuidance: "Use ruler to measure exactly 2 inches from bottom edge and 2 inches from right edge"
       });
@@ -351,7 +351,7 @@ class WorkerService {
         step: steps.length + 1,
         instruction: "Verify all items have correct UPC codes",
         visual: "upc-verification-guide.png",
-        warning: `❌ Missing UPC = ${upcViolation.fine}`,
+        warning: `Missing UPC = ${upcViolation.fine}`,
         nextAction: "Scan each item and verify UPC matches order",
         specificGuidance: "Check that UPC codes are readable and match the order manifest"
       });
@@ -363,7 +363,7 @@ class WorkerService {
       instruction: "Pack items securely with proper protection",
       visual: "packing-guide.png",
       warning: packagingViolations.find(v => v.violation.includes('protection')) ? 
-        "❌ Insufficient protection = $10/carton + $500 inspection fee" : null,
+        "Insufficient protection = $10/carton + $500 inspection fee" : null,
       nextAction: "Add bubble wrap, foam, or other protection as needed",
       specificGuidance: "Ensure items cannot move inside the box"
     });
@@ -426,7 +426,7 @@ class WorkerService {
       .filter(v => v.severity === 'High')
       .map(v => ({
         type: 'high_risk',
-        message: `⚠️ ${v.violation}: ${v.fine}`,
+        message: `Warning: ${v.violation}: ${v.fine}`,
         category: v.category
       }));
   }

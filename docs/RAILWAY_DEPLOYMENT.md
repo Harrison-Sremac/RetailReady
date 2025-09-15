@@ -1,5 +1,7 @@
 # Railway Deployment Guide for RetailReady
 
+**Author:** Harrison Sremac
+
 This guide will help you deploy the RetailReady compliance management application to Railway.
 
 ## Prerequisites

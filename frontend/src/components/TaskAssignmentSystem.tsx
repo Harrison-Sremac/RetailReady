@@ -11,6 +11,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useApp } from '../contexts/AppContext';
 
 interface OrderTask {
   id: string;
@@ -101,12 +102,16 @@ interface OptimizationResult {
  * @returns JSX element
  */
 function TaskAssignmentSystem() {
+  const { violations } = useApp();
   const [orderBreakdown, setOrderBreakdown] = useState<OrderBreakdown | null>(null);
   const [assignments, setAssignments] = useState<{ [taskId: string]: TaskAssignment }>({});
   const [simulationResults, setSimulationResults] = useState<OptimizationResult | null>(null);
   const [workers, setWorkers] = useState<Worker[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Check if routing guide data is available
+  const hasRoutingGuideData = violations.length > 0 && violations.some(v => v.retailer === 'Uploaded Document');
 
   // Form state for order input
   const [orderId, setOrderId] = useState('ORD-001');
@@ -310,6 +315,49 @@ function TaskAssignmentSystem() {
       </div>
     );
   };
+
+  // Show message if no routing guide data is available
+  if (!hasRoutingGuideData) {
+    return (
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Task-Level Worker Assignment
+          </h1>
+          <p className="text-gray-600">
+            Break down orders into compliance-critical tasks and optimize worker assignments
+            to minimize Dick's Sporting Goods violations and fines.
+          </p>
+        </div>
+
+        {/* No Data Message */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-blue-900 mb-2">No Routing Guide Data Available</h2>
+          <p className="text-blue-700 mb-4">
+            To use the Task Assignment system, you need to upload a Dick's Sporting Goods routing guide PDF first.
+          </p>
+          <p className="text-sm text-blue-600 mb-6">
+            The routing guide contains the compliance requirements needed to break down orders into specific tasks and optimize worker assignments.
+          </p>
+          <div className="bg-white rounded-lg p-4 border border-blue-200 max-w-md mx-auto">
+            <h3 className="font-medium text-blue-900 mb-2">What you'll get after upload:</h3>
+            <ul className="text-sm text-blue-700 text-left space-y-1">
+              <li>• Order breakdown into compliance tasks</li>
+              <li>• Worker skill-based assignments</li>
+              <li>• Violation risk predictions</li>
+              <li>• Fine optimization recommendations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -525,7 +573,7 @@ function TaskAssignmentSystem() {
                   
                   {pred.warning && (
                     <div className="mt-2 p-2 bg-yellow-50 text-yellow-800 text-xs rounded">
-                      ⚠️ {pred.warning}
+                      Warning: {pred.warning}
                     </div>
                   )}
                 </div>
