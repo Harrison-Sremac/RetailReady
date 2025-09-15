@@ -24,19 +24,24 @@ Deploy this application to Railway in minutes:
 ## Features
 
 ### Core Functionality
-- **AI Document Parsing**: Upload PDF compliance documents for automatic requirement extraction using OpenAI GPT models
+- **AI Document Parsing**: Upload PDF compliance documents for automatic requirement extraction using OpenAI GPT models with dynamic retailer detection
 - **Risk Assessment Calculator**: Interactive calculator for violation quantities and fine estimation with real-time calculations
 - **Risk Overview System**: Proactive risk prediction using rules-based matching engine (no ML training required)
 - **Multi-Page Interface**: Clean, professional dashboard with separate sections for different workflows
 - **Worker Tools**: Comprehensive interface for warehouse workers with guidance and scanning capabilities
 - **Compliance Management**: Advanced filtering and search capabilities for violations by category, severity, and retailer
+- **Task Assignment System**: Intelligent task assignment and optimization for warehouse operations
+- **Worker Management Dashboard**: Comprehensive worker performance tracking and analytics
 
 ### Advanced Features
+- **Dynamic Retailer Detection**: Automatically identifies document type (Dick's Sporting Goods, Walmart, Target, Amazon, or Generic)
+- **Comprehensive Violation Extraction**: Finds 10+ violations per document instead of just 5 hardcoded violations
 - **Real-time Risk Scoring**: Dynamic risk level determination (High, Medium, Low) based on multiple factors
 - **Contextual Risk Analysis**: Consider time of day, shift load, worker experience, and environmental factors
 - **Routing Guide Analysis**: Parse and analyze complex routing guide documents with order types and specifications
 - **Performance Tracking**: Worker performance metrics and streak tracking
 - **Database Management**: SQLite-based data storage with organized views and comprehensive violation tracking
+- **Flexible Parsing System**: Adapts parsing approach based on detected retailer with fallback for unknown retailers
 
 ## Architecture
 
@@ -137,11 +142,18 @@ Deploy this application to Railway in minutes:
 5. Review extracted requirements in the compliance section
 
 #### What Gets Extracted
-- Compliance requirements and violations
+- Compliance requirements and violations (10+ per document)
 - Fine structures and penalty amounts
 - Category classifications (Pre-Packing, During Packing, Post-Packing, etc.)
 - Severity levels (High, Medium, Low)
-- Retailer-specific requirements
+- Retailer-specific requirements and violation codes
+- Order types and packing methods
+- Carton specifications and dimensional requirements
+- Label placement rules and positioning requirements
+- Timing requirements and deadlines
+- Shipping requirements and carrier specifications
+- Documentation requirements (EDI, ASN, etc.)
+- Product-specific compliance rules
 
 ### 2. Risk Management Tools
 
@@ -284,15 +296,20 @@ retailReady2/
 │   │   ├── upload.js           # File upload endpoints
 │   │   ├── violations.js       # Violations management
 │   │   ├── worker.js           # Worker interface endpoints
-│   │   └── riskOverview.js     # Risk overview endpoints
+│   │   ├── riskOverview.js     # Risk overview endpoints
+│   │   ├── taskAssignment.js   # Task assignment endpoints
+│   │   └── workerManagement.js # Worker management endpoints
 │   ├── services/               # Business logic services
 │   │   ├── databaseService.js  # Database operations
-│   │   ├── parserService.js    # AI document parsing
+│   │   ├── parserService.js    # AI document parsing with retailer detection
 │   │   ├── riskService.js      # Risk calculation logic
 │   │   ├── workerService.js    # Worker management
-│   │   └── riskOverview.js     # Risk overview logic
+│   │   ├── riskOverview.js     # Risk overview logic
+│   │   ├── taskAssignmentService.js # Task assignment logic
+│   │   └── workerManagementData.js # Worker management data seeding
 │   ├── uploads/                # File upload storage
 │   ├── compliance.db           # SQLite database
+│   ├── test-parser.js          # PDF parsing test utility
 │   └── server.js               # Main server application
 ├── frontend/                   # Frontend application
 │   ├── src/
@@ -301,7 +318,9 @@ retailReady2/
 │   │   │   ├── CompliancePage.tsx   # Compliance management
 │   │   │   ├── RiskPage.tsx         # Risk management
 │   │   │   ├── WorkersPage.tsx      # Worker tools
-│   │   │   └── AnalyticsPage.tsx    # Analytics & insights
+│   │   │   ├── AnalyticsPage.tsx    # Analytics & insights
+│   │   │   ├── TaskAssignmentPage.tsx # Task assignment interface
+│   │   │   └── WorkerManagementPage.tsx # Worker management dashboard
 │   │   ├── components/         # Reusable React components
 │   │   │   ├── Navigation.tsx       # Main navigation
 │   │   │   ├── UploadZone.tsx      # File upload component
@@ -311,6 +330,11 @@ retailReady2/
 │   │   │   ├── FilterBar.tsx        # Compliance filtering
 │   │   │   ├── ViolationsList.tsx   # Violations display
 │   │   │   ├── RoutingGuideViewer.tsx # Routing guide analysis
+│   │   │   ├── TaskAssignmentSystem.tsx # Task assignment interface
+│   │   │   ├── WorkerManagementDashboard.tsx # Worker management dashboard
+│   │   │   ├── ViolationMatrixHeatMap.tsx # Violation matrix visualization
+│   │   │   ├── CartonSpecValidator.tsx # Carton specification validator
+│   │   │   ├── OrderTypeDecisionTree.tsx # Order type decision tree
 │   │   │   └── ui/                  # UI components
 │   │   │       ├── CategoryBadge.tsx
 │   │   │       ├── LoadingSpinner.tsx
@@ -550,7 +574,17 @@ NODE_ENV=staging npm start
 
 ## Recent Updates
 
-### Version 2.0.0 (Current)
+### Version 2.1.0 (Current)
+- **Dynamic PDF Parsing**: Implemented retailer detection system for automatic document type identification
+- **Comprehensive Violation Extraction**: Enhanced parsing to find 10+ violations per document instead of 5 hardcoded violations
+- **Flexible Parsing System**: Added support for multiple retailers (Dick's, Walmart, Target, Amazon, Generic)
+- **Enhanced Data Structure**: Added retailer identification and comprehensive requirement categories
+- **Task Assignment System**: Intelligent task assignment and optimization for warehouse operations
+- **Worker Management Dashboard**: Comprehensive worker performance tracking and analytics
+- **Improved Error Handling**: Better error messages and validation for parsing operations
+- **Code Optimization**: Enhanced parser service with dynamic prompt generation
+
+### Version 2.0.0 (Previous)
 - **Risk Overview Feature**: Added rules-based risk prediction system
 - **Multi-Page Application**: Restructured from single-page to multi-page with React Router
 - **Expanded Worker Database**: Added 15 workers with varied experience levels

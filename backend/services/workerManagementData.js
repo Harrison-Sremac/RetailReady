@@ -1,7 +1,18 @@
+/**
+ * Worker Management Data Seeding Service
+ * 
+ * This module handles seeding worker data and scan history for both
+ * local development and Railway deployment environments.
+ * 
+ * @fileoverview Worker management data seeding service
+ * @author RetailReady Team
+ * @version 1.0.0
+ */
+
 const sqlite3 = require('sqlite3').verbose();
 
-// Railway database configuration
-const dbPath = '/tmp/railway.db'; // Railway uses this path
+// Database configuration - adapts to environment
+const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/railway.db' : './compliance.db';
 
 // Worker seed data (same as local)
 const workerSeedData = [
@@ -22,7 +33,13 @@ const workerSeedData = [
   { worker_id: "amy012", name: "Amy Taylor", department: "Packaging" }
 ];
 
-async function seedRailwayDatabase() {
+/**
+ * Seed worker management database with worker data and scan history
+ * Works for both local development and Railway production environments
+ * 
+ * @returns {Promise<void>} Resolves when seeding is complete
+ */
+async function seedWorkerManagementDatabase() {
   return new Promise((resolve, reject) => {
     const db = new sqlite3.Database(dbPath, (err) => {
       if (err) {
@@ -30,7 +47,7 @@ async function seedRailwayDatabase() {
         reject(err);
         return;
       }
-      console.log('Connected to Railway database');
+      console.log(`Connected to ${process.env.NODE_ENV === 'production' ? 'Railway' : 'local'} database`);
     });
 
     // Clear existing worker scan data
@@ -133,13 +150,21 @@ async function seedRailwayDatabase() {
   });
 }
 
-// Run the seeding
-seedRailwayDatabase()
-  .then(() => {
-    console.log('Railway database seeded successfully!');
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error('Error seeding Railway database:', error);
-    process.exit(1);
-  });
+// Export the seeding function for use in other modules
+module.exports = {
+  seedWorkerManagementDatabase,
+  workerSeedData
+};
+
+// Run the seeding if this file is executed directly
+if (require.main === module) {
+  seedWorkerManagementDatabase()
+    .then(() => {
+      console.log('Worker management database seeded successfully!');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('Error seeding worker management database:', error);
+      process.exit(1);
+    });
+}
