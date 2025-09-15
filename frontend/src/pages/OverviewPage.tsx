@@ -36,17 +36,18 @@ export function OverviewPage() {
 
   // Handle clearing uploaded data
   const handleClearUploadedData = async () => {
-    if (!confirm('Are you sure you want to delete all uploaded compliance data? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to delete all uploaded data? This will clear violations and worker scan data. This action cannot be undone.')) {
       return;
     }
 
     try {
-      const response = await fetch('/api/violations/clear-uploaded', {
+      const response = await fetch('/api/violations/clear-all-uploaded', {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        alert('Uploaded data cleared successfully!');
+        const result = await response.json();
+        alert(`Data cleared successfully! Cleared ${result.total_cleared} total records (${result.violations_cleared} violations, ${result.scans_cleared} worker scans)`);
         // Refresh violations data
         await refreshData();
       } else {
@@ -120,10 +121,10 @@ export function OverviewPage() {
               onClick={handleClearUploadedData}
               className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
             >
-              Clear Uploaded Data
+              Clear All Uploaded Data
             </button>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Remove all compliance data from uploaded PDFs
+              Remove all uploaded compliance data and worker scan history
             </p>
           </div>
         </div>

@@ -386,14 +386,14 @@ class DatabaseService {
 
   /**
    * Clear all uploaded compliance data
-   * Removes all violations where retailer is 'Uploaded Document'
+   * Removes all violations that are not seed data (excludes 'Dick's Sporting Goods' seed data)
    * 
    * @returns {Promise<number>} Number of deleted records
    */
   async clearUploadedData() {
     return new Promise((resolve, reject) => {
       this.db.run(
-        "DELETE FROM violations WHERE retailer = 'Uploaded Document'",
+        "DELETE FROM violations WHERE retailer != 'Dick\\'s Sporting Goods' OR retailer IS NULL",
         function(err) {
           if (err) {
             console.error('Database error in clearUploadedData:', err);
@@ -406,6 +406,52 @@ class DatabaseService {
         }
       );
     });
+  }
+
+  /**
+   * Clear all worker scan data
+   * Removes all worker scan history
+   * 
+   * @returns {Promise<number>} Number of deleted records
+   */
+  async clearWorkerScanData() {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        "DELETE FROM worker_scans",
+        function(err) {
+          if (err) {
+            console.error('Database error in clearWorkerScanData:', err);
+            reject(new Error('Failed to clear worker scan data'));
+            return;
+          }
+          
+          console.log(`Cleared ${this.changes} worker scan records`);
+          resolve(this.changes);
+        }
+      );
+    });
+  }
+
+  /**
+   * Clear all uploaded data (violations + worker scans)
+   * Comprehensive clear function for all user-uploaded data
+   * 
+   * @returns {Promise<Object>} Object with counts of cleared records
+   */
+  async clearAllUploadedData() {
+    try {
+      const violationsCleared = await this.clearUploadedData();
+      const scansCleared = await this.clearWorkerScanData();
+      
+      return {
+        violationsCleared,
+        scansCleared,
+        totalCleared: violationsCleared + scansCleared
+      };
+    } catch (error) {
+      console.error('Error clearing all uploaded data:', error);
+      throw error;
+    }
   }
 
   /**

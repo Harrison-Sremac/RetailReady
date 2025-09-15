@@ -296,6 +296,42 @@ function createViolationsRouter(db) {
   });
 
   /**
+   * DELETE /api/violations/clear-all-uploaded
+   * 
+   * Clear all uploaded data (violations + worker scans)
+   * 
+   * @route DELETE /api/violations/clear-all-uploaded
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Promise<void>}
+   */
+  router.delete('/clear-all-uploaded', async (req, res) => {
+    try {
+      console.log('Clearing all uploaded data...');
+      
+      const result = await dbService.clearAllUploadedData();
+      
+      console.log(`Cleared ${result.totalCleared} total records (${result.violationsCleared} violations, ${result.scansCleared} scans)`);
+      
+      res.json({
+        success: true,
+        violations_cleared: result.violationsCleared,
+        scans_cleared: result.scansCleared,
+        total_cleared: result.totalCleared,
+        message: `Successfully cleared ${result.totalCleared} total records (${result.violationsCleared} violations, ${result.scansCleared} worker scans)`
+      });
+      
+    } catch (error) {
+      console.error('Error clearing all uploaded data:', error);
+      
+      res.status(500).json({
+        error: 'Failed to clear all uploaded data',
+        message: error.message || 'An unexpected error occurred'
+      });
+    }
+  });
+
+  /**
    * DELETE /api/violations/clear-all
    * 
    * Clear ALL compliance data (including sample data)
