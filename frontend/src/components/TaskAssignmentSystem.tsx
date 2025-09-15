@@ -111,7 +111,8 @@ function TaskAssignmentSystem() {
   const [error, setError] = useState<string | null>(null);
 
   // Check if routing guide data is available
-  const hasRoutingGuideData = violations.length > 0 && violations.some(v => v.retailer === 'Uploaded Document');
+  // Look for any violations that are not from seed data (Dick's Sporting Goods)
+  const hasRoutingGuideData = violations.length > 0 && violations.some(v => v.retailer !== 'Dick\'s Sporting Goods');
 
   // Form state for order input
   const [orderId, setOrderId] = useState('ORD-001');
@@ -125,6 +126,15 @@ function TaskAssignmentSystem() {
   useEffect(() => {
     loadWorkers();
   }, []);
+
+  /**
+   * Refresh workers when violations data changes (after PDF upload)
+   */
+  useEffect(() => {
+    if (hasRoutingGuideData) {
+      loadWorkers();
+    }
+  }, [violations]);
 
   /**
    * Load all workers with their skill profiles
@@ -338,12 +348,12 @@ function TaskAssignmentSystem() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-blue-900 mb-2">No Routing Guide Data Available</h2>
+          <h2 className="text-xl font-semibold text-blue-900 mb-2">No Uploaded Compliance Data Available</h2>
           <p className="text-blue-700 mb-4">
-            To use the Task Assignment system, you need to upload a Dick's Sporting Goods routing guide PDF first.
+            To use the Task Assignment system, you need to upload a compliance document PDF first.
           </p>
           <p className="text-sm text-blue-600 mb-6">
-            The routing guide contains the compliance requirements needed to break down orders into specific tasks and optimize worker assignments.
+            The uploaded document contains the compliance requirements needed to break down orders into specific tasks and optimize worker assignments.
           </p>
           <div className="bg-white rounded-lg p-4 border border-blue-200 max-w-md mx-auto">
             <h3 className="font-medium text-blue-900 mb-2">What you'll get after upload:</h3>
