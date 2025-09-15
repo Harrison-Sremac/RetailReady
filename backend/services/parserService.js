@@ -22,6 +22,58 @@ const openai = new OpenAI({
 });
 
 /**
+ * Retailer-specific parsing configurations
+ * Contains prompts and patterns for different retailers
+ */
+const retailerConfigs = {
+  "Dick's Sporting Goods": {
+    name: "Dick's Sporting Goods",
+    keywords: ["Dick's Sporting Goods", "Dick's", "Dicks Sporting Goods", "DSG"],
+    violationCodes: ["NL", "EA", "RP", "MC", "CO", "AS", "BL", "CC", "CR", "CS", "DC", "DI", "DM", "DP", "DR", "DS", "DT", "DU", "DV", "DW", "DX", "DY", "DZ"],
+    specificPrompts: {
+      violationFocus: "Look for Dick's Sporting Goods specific violation codes: NL (UCC128 label), EA (ASN violations), RP (retail price), MC (multiple UPCs), CO (PO cancel date), and ANY OTHER violation codes mentioned. Also look for: carton specifications, weight limits, dimensional requirements, label placement rules, timing requirements, carrier requirements, quality standards, inventory requirements, communication requirements, operational procedures, environmental requirements, security protocols, and any other compliance requirements mentioned anywhere in the document.",
+      fineStructure: "Dick's typically uses per-carton fines ($7.50) plus service fees ($250), per-unit fines ($0.50), and flat fees ($50). Look for ANY other fine amounts, penalties, or chargebacks mentioned in the document."
+    }
+  },
+  "Walmart": {
+    name: "Walmart",
+    keywords: ["Walmart", "Wal-Mart", "Sam's Club"],
+    violationCodes: ["ASN", "EDI", "UPC", "LABEL", "PACK", "SHIP"],
+    specificPrompts: {
+      violationFocus: "Look for Walmart-specific compliance requirements including ASN violations, EDI requirements, UPC accuracy, and packaging standards.",
+      fineStructure: "Walmart typically uses chargeback systems with per-item or per-shipment penalties."
+    }
+  },
+  "Target": {
+    name: "Target",
+    keywords: ["Target", "Target Corporation"],
+    violationCodes: ["ASN", "EDI", "UPC", "LABEL", "PACK", "SHIP"],
+    specificPrompts: {
+      violationFocus: "Look for Target-specific compliance requirements including ASN violations, EDI requirements, UPC accuracy, and packaging standards.",
+      fineStructure: "Target typically uses chargeback systems with per-item or per-shipment penalties."
+    }
+  },
+  "Amazon": {
+    name: "Amazon",
+    keywords: ["Amazon", "Amazon.com", "FBA", "Fulfillment by Amazon"],
+    violationCodes: ["ASIN", "FNSKU", "LABEL", "PACK", "SHIP"],
+    specificPrompts: {
+      violationFocus: "Look for Amazon-specific compliance requirements including ASIN accuracy, FNSKU labeling, packaging standards, and shipping requirements.",
+      fineStructure: "Amazon typically uses per-unit penalties and may suspend selling privileges for violations."
+    }
+  },
+  "Generic": {
+    name: "Generic Retailer",
+    keywords: [],
+    violationCodes: [],
+    specificPrompts: {
+      violationFocus: "Look for any violation codes, compliance requirements, fine structures, and penalty systems mentioned in the document.",
+      fineStructure: "Extract any fine amounts, penalty structures, chargeback systems, or violation fees mentioned."
+    }
+  }
+};
+
+/**
  * Parser configuration object
  * Contains settings for AI parsing operations
  */
@@ -36,34 +88,62 @@ const parserConfig = {
   maxTextLength: 50000,
   
   // System prompt for the AI assistant
-  systemPrompt: "You are an expert at parsing retailer routing guides and compliance documents. You excel at extracting structured data about requirements, violations, fines, and operational guidelines. You can identify packing methods, violation matrices, specifications, timing requirements, and product-specific rules.",
+  systemPrompt: "You are an expert at parsing retailer routing guides and compliance documents. You excel at extracting structured data about requirements, violations, fines, and operational guidelines. You can identify packing methods, violation matrices, specifications, timing requirements, and product-specific rules from ANY retailer's compliance documents.",
   
-  // User prompt template
-  userPromptTemplate: `
-    Parse the following Dick's Sporting Goods routing guide text and extract REAL compliance requirements with ACTUAL fine amounts from the document.
+  // Base user prompt template (will be customized based on retailer detection)
+  basePromptTemplate: `
+    Parse the following retailer routing guide/compliance document text and extract ALL compliance requirements with ACTUAL fine amounts from the document.
     
-    CRITICAL: Look for these SPECIFIC violation codes and fine amounts that are mentioned in the document:
+    RETAILER DETECTED: {retailerName}
     
-    VIOLATION CODES TO FIND:
-    - NL: UCC128 label not on carton ($7.50 per carton + $250 service fee)
-    - EA: ASN violations ($250-$500 per shipment)
-    - RP: Retail price missing/inaccurate ($0.50 per unit + $250 service fee)
-    - MC: Multiple UPCs mixed in one carton ($50 per occurrence)
-    - CO: PO received after cancel date ($50)
-    - And other violation codes mentioned in the document
+    {retailerSpecificInstructions}
     
-    Extract data in these specific categories:
+    COMPREHENSIVE VIOLATION DETECTION - BE THOROUGH AND AGGRESSIVE:
+    You MUST find EVERY SINGLE compliance requirement, violation, penalty, fine, chargeback, or non-compliance issue mentioned in this document. Look for:
+    
+    CORE VIOLATION CATEGORIES:
+    - Labeling violations (UCC128, FNSKU, ASIN, UPC, barcode, label placement, label accuracy)
+    - ASN/EDI violations (Advanced Shipping Notice, Electronic Data Interchange, timing, accuracy)
+    - Packaging violations (carton specifications, weight limits, dimensions, materials, construction)
+    - Shipping violations (carrier requirements, routing, timing, delivery, tracking)
+    - Product violations (UPC accuracy, retail price, product mixing, SKU accuracy, product codes)
+    - Documentation violations (PO accuracy, cancel dates, paperwork, forms, certificates)
+    - Quality violations (damaged goods, defective products, quality standards)
+    - Inventory violations (quantity discrepancies, stock levels, inventory accuracy)
+    - Compliance violations (regulatory requirements, safety standards, certifications)
+    - Operational violations (processing time, handling procedures, storage requirements)
+    - Communication violations (notification requirements, reporting, updates)
+    - Financial violations (billing accuracy, payment terms, invoicing)
+    - Environmental violations (packaging materials, sustainability requirements)
+    - Security violations (access control, handling procedures, security protocols)
+    
+    SEARCH STRATEGY:
+    1. Look for ANY text that mentions "violation", "fine", "penalty", "chargeback", "fee", "cost"
+    2. Find ALL instances of dollar amounts ($X.XX, $X, etc.)
+    3. Look for requirement words: "must", "shall", "required", "prohibited", "not allowed", "cannot"
+    4. Find conditional statements: "if", "when", "unless", "except"
+    5. Look for violation codes, error codes, or reference numbers
+    6. Find timing requirements and deadlines
+    7. Look for specifications, standards, or guidelines
+    8. Find any consequences or penalties mentioned
+    9. Look for "failure to", "non-compliance", "incorrect", "inaccurate", "missing"
+    10. Find any operational requirements or procedures
+    
+    Extract data in these comprehensive categories:
     
     1. ORDER TYPE REQUIREMENTS - Different packing methods and their rules
-    2. VIOLATION MATRIX - All violation codes with ACTUAL fine amounts and triggers
+    2. VIOLATION MATRIX - ALL violation codes with ACTUAL fine amounts and triggers
     3. CARTON SPECIFICATIONS - Size, weight, and dimensional requirements
     4. LABEL PLACEMENT RULES - Exact positioning requirements and special cases
     5. TIMING REQUIREMENTS - Critical deadlines for ASN, routing requests, etc.
     6. PRODUCT-SPECIFIC REQUIREMENTS - Category-specific rules (apparel, footwear, etc.)
+    7. SHIPPING REQUIREMENTS - Carrier specifications, routing rules, delivery requirements
+    8. DOCUMENTATION REQUIREMENTS - EDI, ASN, PO, and paperwork requirements
     
     Return the data in JSON format with this comprehensive structure:
     
     {
+      "retailer": "{retailerName}",
       "requirements": [
         {
           "requirement": "specific requirement text from the document",
@@ -75,7 +155,8 @@ const parserConfig = {
           "fine_unit": "unit of measurement (per carton, per item, per violation, flat fee)",
           "additional_fees": "any additional fees or penalties",
           "prevention_method": "how to prevent this violation",
-          "responsible_party": "who is responsible for prevention"
+          "responsible_party": "who is responsible for prevention",
+          "violation_code": "specific violation code if mentioned (e.g., NL, EA, RP, etc.)"
         }
       ],
       "order_types": [
@@ -124,19 +205,48 @@ const parserConfig = {
           "special_rules": ["special rule 1", "special rule 2"],
           "violations": ["violation description 1", "violation description 2"]
         }
+      ],
+      "shipping_requirements": [
+        {
+          "requirement": "shipping requirement name",
+          "carrier": "specific carrier requirements",
+          "routing": "routing specifications",
+          "violation_fine": "fine for shipping violations"
+        }
+      ],
+      "documentation_requirements": [
+        {
+          "requirement": "documentation requirement name",
+          "edi_requirements": "EDI specifications",
+          "asn_requirements": "ASN requirements",
+          "violation_fine": "fine for documentation violations"
+        }
       ]
     }
     
-    EXTRACTION FOCUS:
-    1. Look for "Violation Amount" sections with actual fine amounts
-    2. Find specific requirement text that mentions "must", "shall", "required"
-    3. Extract actual dollar amounts like "$7.50", "$250", "$500", etc.
-    4. Look for violation codes (NL, EA, RP, MC, CO, etc.)
-    5. Find timing requirements (ASN within 1 hour, etc.)
-    6. Extract carton specifications and dimensional requirements
-    7. Find label placement rules and positioning requirements
+    EXTRACTION FOCUS - BE EXTREMELY THOROUGH:
+    1. Look for "Violation Amount", "Fine", "Penalty", "Chargeback", "Fee", "Cost" sections with actual amounts
+    2. Find ALL requirement text that mentions "must", "shall", "required", "prohibited", "not allowed", "cannot", "failure to"
+    3. Extract ALL dollar amounts like "$7.50", "$250", "$500", "$0.50", "$1.00", "$10", "$25", "$100", etc.
+    4. Look for ALL violation codes, error codes, reference numbers (NL, EA, RP, MC, CO, ASN, EDI, UPC, etc.)
+    5. Find ALL timing requirements (ASN within 1 hour, EDI deadlines, processing times, etc.)
+    6. Extract ALL carton specifications, dimensional requirements, weight limits, material requirements
+    7. Find ALL label placement rules, positioning requirements, label content requirements
+    8. Look for carrier-specific requirements, routing rules, delivery requirements, tracking requirements
+    9. Extract EDI and documentation requirements, form requirements, certificate requirements
+    10. Find product-specific compliance rules, quality standards, inspection requirements
+    11. Look for inventory requirements, quantity requirements, stock level requirements
+    12. Find communication requirements, notification requirements, reporting requirements
+    13. Look for operational requirements, handling procedures, storage requirements
+    14. Find environmental requirements, sustainability requirements, packaging material requirements
+    15. Look for security requirements, access control, handling procedures
+    16. Find any conditional requirements ("if", "when", "unless", "except")
+    17. Look for any consequences, penalties, or non-compliance results
+    18. Find any specifications, standards, guidelines, or procedures mentioned
     
-    IMPORTANT: Only extract requirements that are ACTUALLY mentioned in the document. Don't make up requirements or fine amounts. Be accurate to what's written in the Dick's Sporting Goods routing guide.
+    CRITICAL INSTRUCTION: You MUST extract EVERY SINGLE compliance requirement, violation, penalty, fine, or non-compliance issue mentioned anywhere in this document. Do not stop at just the obvious ones. Look through the ENTIRE document systematically. If you find fewer than 10 violations, you are not being thorough enough. A comprehensive routing guide typically contains 15-30+ different compliance requirements and violations.
+    
+    IMPORTANT: Extract EVERY compliance requirement and violation mentioned in the document. Don't limit yourself to just a few categories. Be comprehensive and thorough. Only extract requirements that are ACTUALLY mentioned in the document. Don't make up requirements or fine amounts. Be accurate to what's written in the routing guide.
     
     Text to parse:
     {text}
@@ -144,18 +254,76 @@ const parserConfig = {
 };
 
 /**
+ * Detect retailer from PDF text content
+ * Analyzes the text to identify which retailer the document belongs to
+ * 
+ * @param {string} pdfText - The extracted text from the PDF document
+ * @returns {Object} Detected retailer configuration
+ */
+function detectRetailer(pdfText) {
+  const text = pdfText.toLowerCase();
+  
+  // Check each retailer configuration
+  for (const [retailerName, config] of Object.entries(retailerConfigs)) {
+    if (retailerName === "Generic") continue; // Skip generic, use as fallback
+    
+    // Check if any keywords match
+    const hasKeyword = config.keywords.some(keyword => 
+      text.includes(keyword.toLowerCase())
+    );
+    
+    if (hasKeyword) {
+      console.log(`Detected retailer: ${retailerName}`);
+      return config;
+    }
+  }
+  
+  // Fallback to generic if no specific retailer detected
+  console.log('No specific retailer detected, using generic parsing');
+  return retailerConfigs.Generic;
+}
+
+/**
+ * Generate dynamic prompt based on detected retailer
+ * Creates a customized prompt for the specific retailer
+ * 
+ * @param {Object} retailerConfig - The detected retailer configuration
+ * @param {string} pdfText - The PDF text to parse
+ * @returns {string} Customized prompt for the retailer
+ */
+function generateDynamicPrompt(retailerConfig, pdfText) {
+  const retailerSpecificInstructions = `
+    ${retailerConfig.specificPrompts.violationFocus}
+    
+    ${retailerConfig.specificPrompts.fineStructure}
+    
+    ${retailerConfig.violationCodes.length > 0 ? 
+      `Known violation codes for this retailer: ${retailerConfig.violationCodes.join(', ')}` : 
+      'Look for any violation codes mentioned in the document'
+    }
+  `;
+  
+  return parserConfig.basePromptTemplate
+    .replace('{retailerName}', retailerConfig.name)
+    .replace('{retailerSpecificInstructions}', retailerSpecificInstructions)
+    .replace('{text}', pdfText);
+}
+
+/**
  * Parse compliance data from PDF text using OpenAI
  * 
  * This function takes raw PDF text and uses AI to extract structured
  * compliance requirements, violations, and fine information.
+ * Now supports dynamic retailer detection and comprehensive parsing.
  * 
  * @param {string} pdfText - The extracted text from the PDF document
- * @returns {Promise<Array>} Array of parsed compliance requirements
+ * @returns {Promise<Object>} Structured compliance data with retailer info
  * @throws {Error} Throws error if parsing fails
  * 
  * @example
- * const requirements = await parseComplianceData("PDF text content...");
- * console.log(requirements); // [{ requirement: "...", violation: "...", ... }]
+ * const data = await parseComplianceData("PDF text content...");
+ * console.log(data.requirements); // [{ requirement: "...", violation: "...", ... }]
+ * console.log(data.retailer); // "Dick's Sporting Goods"
  */
 async function parseComplianceData(pdfText) {
   try {
@@ -164,13 +332,16 @@ async function parseComplianceData(pdfText) {
       throw new Error('Invalid PDF text provided');
     }
     
+    // Detect retailer from PDF content
+    const detectedRetailer = detectRetailer(pdfText);
+    
     // Truncate text to avoid token limits
     const truncatedText = pdfText.substring(0, parserConfig.maxTextLength);
     
-    // Create the user prompt with the PDF text
-    const userPrompt = parserConfig.userPromptTemplate.replace('{text}', truncatedText);
+    // Generate dynamic prompt based on detected retailer
+    const userPrompt = generateDynamicPrompt(detectedRetailer, truncatedText);
     
-    console.log('Sending request to OpenAI for compliance parsing...');
+    console.log(`Sending request to OpenAI for ${detectedRetailer.name} compliance parsing...`);
     
     // Make request to OpenAI
     const response = await openai.chat.completions.create({
@@ -219,22 +390,26 @@ async function parseComplianceData(pdfText) {
       req.additional_fees = req.additional_fees || null;
       req.prevention_method = req.prevention_method || 'Manual verification';
       req.responsible_party = req.responsible_party || 'Warehouse Worker';
+      req.violation_code = req.violation_code || null;
       
       return req;
     });
     
-    // Validate and structure additional data sections
+    // Validate and structure additional data sections with new comprehensive structure
     const structuredData = {
+      retailer: detectedRetailer.name,
       requirements: validatedRequirements,
       order_types: parsedData.order_types || [],
       carton_specs: parsedData.carton_specs || {},
       label_placement: parsedData.label_placement || [],
       timing_requirements: parsedData.timing_requirements || [],
-      product_requirements: parsedData.product_requirements || []
+      product_requirements: parsedData.product_requirements || [],
+      shipping_requirements: parsedData.shipping_requirements || [],
+      documentation_requirements: parsedData.documentation_requirements || []
     };
     
-    console.log(`Successfully parsed ${validatedRequirements.length} compliance requirements`);
-    console.log(`Additional data: ${structuredData.order_types.length} order types, ${structuredData.label_placement.length} label rules, ${structuredData.timing_requirements.length} timing requirements`);
+    console.log(`Successfully parsed ${validatedRequirements.length} compliance requirements for ${detectedRetailer.name}`);
+    console.log(`Additional data: ${structuredData.order_types.length} order types, ${structuredData.label_placement.length} label rules, ${structuredData.timing_requirements.length} timing requirements, ${structuredData.shipping_requirements.length} shipping requirements, ${structuredData.documentation_requirements.length} documentation requirements`);
     
     return structuredData;
     
@@ -261,6 +436,7 @@ async function parseComplianceData(pdfText) {
 /**
  * Validate parsed compliance requirements and structured data
  * Ensures all required fields are present and properly formatted
+ * Now supports the new comprehensive structure with retailer detection
  * 
  * @param {Object|Array} data - Parsed data structure or array of requirements
  * @returns {boolean} True if all requirements are valid
@@ -294,21 +470,27 @@ function validateRequirements(data) {
   });
   
   // If structured data, validate additional sections
-  if (!Array.isArray(data) && data.order_types) {
-    if (!Array.isArray(data.order_types)) {
-      throw new Error('Order types must be an array');
+  if (!Array.isArray(data)) {
+    // Validate retailer field
+    if (!data.retailer || typeof data.retailer !== 'string') {
+      throw new Error('Retailer field is required in structured data');
     }
     
-    if (!Array.isArray(data.label_placement)) {
-      throw new Error('Label placement must be an array');
-    }
+    // Validate all array sections
+    const arraySections = [
+      'order_types', 'label_placement', 'timing_requirements', 
+      'product_requirements', 'shipping_requirements', 'documentation_requirements'
+    ];
     
-    if (!Array.isArray(data.timing_requirements)) {
-      throw new Error('Timing requirements must be an array');
-    }
+    arraySections.forEach(section => {
+      if (data[section] && !Array.isArray(data[section])) {
+        throw new Error(`${section} must be an array`);
+      }
+    });
     
-    if (!Array.isArray(data.product_requirements)) {
-      throw new Error('Product requirements must be an array');
+    // Validate carton_specs object
+    if (data.carton_specs && typeof data.carton_specs !== 'object') {
+      throw new Error('carton_specs must be an object');
     }
   }
   
@@ -335,5 +517,8 @@ module.exports = {
   parseComplianceData,
   validateRequirements,
   getParserStats,
+  detectRetailer,
+  generateDynamicPrompt,
+  retailerConfigs,
   parserConfig
 };

@@ -78,7 +78,7 @@ function createUploadRouter(db) {
       const insertedIds = await dbService.insertViolationsBatch(
         requirements.map(req => ({
           ...req,
-          retailer: "Uploaded Document"
+          retailer: structuredData.retailer || "Uploaded Document"
         }))
       );
 
