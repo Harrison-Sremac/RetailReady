@@ -18,8 +18,10 @@ const path = require('path');
  * Contains all database-related settings and connection parameters
  */
 const dbConfig = {
-  // Database file path
-  dbPath: path.join(__dirname, '../compliance.db'),
+  // Database file path - use Railway persistent volume in production
+  dbPath: process.env.NODE_ENV === 'production' 
+    ? path.join('/data', 'compliance.db')  // Railway persistent volume
+    : path.join(__dirname, '../compliance.db'),  // Local development
   
   // Database connection options
   connectionOptions: {

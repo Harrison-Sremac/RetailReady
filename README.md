@@ -2,6 +2,23 @@
 
 A comprehensive compliance risk assessment platform that helps retailers and suppliers manage compliance requirements, assess risks, and calculate potential fines using AI-powered document parsing. Built with modern web technologies and designed for enterprise use.
 
+## 🚀 Quick Deploy to Railway
+
+Deploy this application to Railway in minutes:
+
+1. **Fork this repository** to your GitHub account
+2. **Sign up at [Railway](https://railway.app)** and connect your GitHub
+3. **Create a new project** and select your forked repository
+4. **Set environment variables**:
+   - `NODE_ENV=production`
+   - `OPENAI_API_KEY=your_openai_api_key_here`
+5. **Add a persistent volume** mounted at `/data` for the database
+6. **Deploy!** Railway will automatically build and deploy your app
+
+📖 **Detailed deployment guide**: See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md)
+
+🔧 **Quick deploy script**: Run `npm run railway:deploy` (requires Railway CLI)
+
 ## Features
 
 ### Core Functionality

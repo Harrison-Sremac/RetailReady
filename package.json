@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "start": "concurrently \"npm run server:start\" \"npm run client:build\"",
+    "start": "npm run build && cd backend && npm start",
     "server": "cd backend && npm run dev",
     "server:start": "cd backend && npm start",
     "client": "cd frontend && npm run dev",
@@ -13,7 +13,8 @@
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "build": "cd frontend && npm run build",
     "test": "echo \"Run tests in individual packages\"",
-    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules backend/dist frontend/dist"
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules backend/dist frontend/dist",
+    "railway:deploy": "./deploy-to-railway.sh"
   },
   "keywords": [
     "compliance",

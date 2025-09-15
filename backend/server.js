@@ -32,7 +32,9 @@ const config = {
   port: process.env.PORT || 3001,
   environment: process.env.NODE_ENV || 'development',
   corsOptions: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.NODE_ENV === 'production' 
+      ? [process.env.RAILWAY_PUBLIC_DOMAIN, process.env.FRONTEND_URL].filter(Boolean)
+      : process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true
   }
 };
@@ -96,6 +98,12 @@ class RetailReadyServer {
     
     // Static file serving for uploads
     this.app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+    
+    // Serve static files from React build in production
+    if (config.environment === 'production') {
+      const frontendBuildPath = path.join(__dirname, '../frontend/dist');
+      this.app.use(express.static(frontendBuildPath));
+    }
     
     // Request logging middleware
     this.app.use((req, res, next) => {
@@ -168,14 +176,21 @@ class RetailReadyServer {
     this.app.use('/api/risk/overview', createRiskOverviewRouter());
     this.app.use('/api/worker', createWorkerRouter(this.db));
 
-    // 404 handler for undefined routes
-    this.app.use('*', (req, res) => {
-      res.status(404).json({
-        error: 'Route not found',
-        message: `The requested route ${req.method} ${req.originalUrl} was not found`,
-        availableRoutes: '/api'
+    // Serve React app for client-side routing in production
+    if (config.environment === 'production') {
+      this.app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
       });
-    });
+    } else {
+      // 404 handler for undefined routes in development
+      this.app.use('*', (req, res) => {
+        res.status(404).json({
+          error: 'Route not found',
+          message: `The requested route ${req.method} ${req.originalUrl} was not found`,
+          availableRoutes: '/api'
+        });
+      });
+    }
     
     console.log('Routes setup completed');
   }
