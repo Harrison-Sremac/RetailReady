@@ -12,22 +12,27 @@
 /**
  * API Configuration
  */
+// Dynamic API base URL - use current origin in production, localhost in development
+const API_BASE_URL = import.meta.env.PROD 
+  ? `${window.location.origin}/api`
+  : 'http://localhost:3001/api';
+
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:3001/api',
+  BASE_URL: API_BASE_URL,
   ENDPOINTS: {
-    HEALTH: 'http://localhost:3001/api/health',
-    VIOLATIONS: 'http://localhost:3001/api/violations',
-    CATEGORIES: 'http://localhost:3001/api/violations/categories',
-    RETAILERS: 'http://localhost:3001/api/violations/retailers',
-    UPLOAD: 'http://localhost:3001/api/upload',
-    UPLOAD_VALIDATE: 'http://localhost:3001/api/upload/validate',
-    UPLOAD_INFO: 'http://localhost:3001/api/upload/info',
-    RISK_SCORE: 'http://localhost:3001/api/risk/score',
-    RISK_BATCH: 'http://localhost:3001/api/risk/batch',
-    RISK_ESTIMATE: 'http://localhost:3001/api/risk/estimate',
-    RISK_CONFIG: 'http://localhost:3001/api/risk/config',
-    WORKER_SCAN: 'http://localhost:3001/api/worker/scan',
-    WORKER_PERFORMANCE: 'http://localhost:3001/api/worker'
+    HEALTH: `${API_BASE_URL}/health`,
+    VIOLATIONS: `${API_BASE_URL}/violations`,
+    CATEGORIES: `${API_BASE_URL}/violations/categories`,
+    RETAILERS: `${API_BASE_URL}/violations/retailers`,
+    UPLOAD: `${API_BASE_URL}/upload`,
+    UPLOAD_VALIDATE: `${API_BASE_URL}/upload/validate`,
+    UPLOAD_INFO: `${API_BASE_URL}/upload/info`,
+    RISK_SCORE: `${API_BASE_URL}/risk/score`,
+    RISK_BATCH: `${API_BASE_URL}/risk/batch`,
+    RISK_ESTIMATE: `${API_BASE_URL}/risk/estimate`,
+    RISK_CONFIG: `${API_BASE_URL}/risk/config`,
+    WORKER_SCAN: `${API_BASE_URL}/worker/scan`,
+    WORKER_PERFORMANCE: `${API_BASE_URL}/worker`
   }
 } as const;
 

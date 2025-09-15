@@ -29,7 +29,7 @@ const createWorkerRouter = require('./routes/worker');
  * Application configuration
  */
 const config = {
-  port: process.env.PORT || 3001,
+  port: process.env.PORT || 8080,
   environment: process.env.NODE_ENV || 'development',
   corsOptions: {
     origin: process.env.NODE_ENV === 'production' 
