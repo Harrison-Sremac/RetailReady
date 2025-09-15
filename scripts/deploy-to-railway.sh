@@ -17,7 +17,7 @@ fi
 
 # Check if user is logged in
 if ! railway whoami &> /dev/null; then
-    echo "🔐 Please log in to Railway:"
+    echo "Please log in to Railway:"
     railway login
 fi
 
@@ -51,4 +51,4 @@ echo "Deployment initiated!"
 echo "Monitor your deployment at: https://railway.app/dashboard"
 echo "Your app will be available at the URL provided by Railway"
 echo ""
-echo "📖 For detailed instructions, see RAILWAY_DEPLOYMENT.md"
+echo "For detailed instructions, see RAILWAY_DEPLOYMENT.md"
